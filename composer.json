@@ -1,0 +1,13 @@
+{
+    "name": "hexlet/code",
+    "description": "Web site for analizing webs for SEO",
+    "type": "project",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "m.vorobyev",
+            "email": "max9680@mail.ru"
+        }
+    ],
+    "require": {}
+}
