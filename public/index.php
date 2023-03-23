@@ -40,9 +40,14 @@ $app->get('/urls', function ($request, $response) {
 
     $urls = $pdo->query("SELECT * FROM urls ORDER BY id DESC")->fetchAll(\PDO::FETCH_ASSOC);
 
-    $urlsWCheck = array_reduce($urls, function($acc, $url) use ($pdo) {
+    $urlsWCheck = array_reduce($urls, function ($acc, $url) use ($pdo) {
         $id = $url['id'];
-        $lastcheck = $pdo->query("SELECT url_checks.created_at AS url_checks_created_at, url_checks.status_code AS url_checks_status_code FROM urls JOIN url_checks ON urls.id = url_checks.url_id WHERE urls.id = $id ORDER BY url_checks.created_at DESC LIMIT 1")->fetchAll(\PDO::FETCH_COLUMN);
+
+        $sql = "SELECT url_checks.created_at AS url_checks_created_at,
+                         url_checks.status_code AS url_checks_status_code
+                         FROM urls JOIN url_checks ON urls.id = url_checks.url_id
+                         WHERE urls.id = $id ORDER BY url_checks.created_at DESC LIMIT 1";
+        $lastcheck = $pdo->query($sql)->fetchAll(\PDO::FETCH_COLUMN);
         $url['lastcheck'] = $lastcheck[0];
         // print_r($url);
         $acc[] = $url;
