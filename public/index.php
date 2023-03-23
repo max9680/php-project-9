@@ -40,8 +40,19 @@ $app->get('/urls', function ($request, $response) {
 
     $urls = $pdo->query("SELECT * FROM urls ORDER BY id DESC")->fetchAll(\PDO::FETCH_ASSOC);
 
+    $urlsWCheck = array_reduce($urls, function($acc, $url) use ($pdo) {
+        $id = $url['id'];
+        $lastcheck = $pdo->query("SELECT url_checks.created_at AS url_checks_created_at, url_checks.status_code AS url_checks_status_code FROM urls JOIN url_checks ON urls.id = url_checks.url_id WHERE urls.id = $id ORDER BY url_checks.created_at DESC LIMIT 1")->fetchAll(\PDO::FETCH_COLUMN);
+        $url['lastcheck'] = $lastcheck[0];
+        // print_r($url);
+        $acc[] = $url;
+        return $acc;
+    }, []);
+
+    // print_r($urlsWCheck);
+
     $params = [
-        'urls' => $urls
+        'urls' => $urlsWCheck
     ];
 
     return $this->get('renderer')->render($response, 'urls/index.phtml', $params);
@@ -129,7 +140,7 @@ $app->post('/urls', function ($request, $response) use ($router) {
 
 $app->post('/urls/{id}/checks', function ($request, $response, array $args) use ($router) {
     $pdo = Connection::get()->connect();
-    
+
     $id = $args['id'];
     $nowTime = Carbon::now();
     $arrVars = [$id, $nowTime];

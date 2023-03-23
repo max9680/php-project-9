@@ -45,13 +45,9 @@
                         <td>
                             <?= htmlspecialchars($url['id']) ?>
                         </td>
-                        <td>
-                            <a href="urls/<?= htmlspecialchars($url['id']) ?>"><?= htmlspecialchars($url['name']) ?></a>
-                        </td>
-                        <td>
-                        </td>
-                        <td>
-                        </td>
+                        <td><a href="urls/<?= htmlspecialchars($url['id']) ?>"><?= htmlspecialchars($url['name']) ?></a></td>
+                        <td><?= htmlspecialchars($url['lastcheck']) ?></td>
+                        <td></td>
                     </tr>
                     <?php endforeach; ?>
                 </tbody>
