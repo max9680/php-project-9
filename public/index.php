@@ -35,11 +35,11 @@ $app->get('/', function ($request, $response) {
 
 
 $app->get('/urls', function ($request, $response) {
-    
+
     $pdo = Connection::get()->connect();
 
     $urls = $pdo->query("SELECT * FROM urls ORDER BY id DESC")->fetchAll(\PDO::FETCH_ASSOC);
-    
+
     $params = [
         'urls' => $urls
     ];
@@ -49,7 +49,7 @@ $app->get('/urls', function ($request, $response) {
 
 $app->get('/urls/{id}', function ($request, $response, array $args) {
     $pdo = Connection::get()->connect();
-    
+
     $messages = $this->get('flash')->getMessages();
 
     $id = $args['id'];
@@ -83,8 +83,7 @@ $app->post('/urls', function ($request, $response) use ($router) {
         ]
     ]);
 
-    if (($v->validate()) & ($url['name'] != NULL)) {
-
+    if (($v->validate()) & ($url['name'] != null)) {
         $parsedUrl = parse_url($url['name']);
         $urlForInput = $parsedUrl['scheme'] . '://' . $parsedUrl['host'];
 
@@ -99,7 +98,7 @@ $app->post('/urls', function ($request, $response) use ($router) {
         } else {
             $nowTime = Carbon::now();
             $arrVars = [$urlForInput, $nowTime];
-            $values = implode(', ', array_map(function($item) use ($pdo) {
+            $values = implode(', ', array_map(function ($item) use ($pdo) {
                 return $pdo->quote($item);
             }, $arrVars));
 
@@ -111,7 +110,7 @@ $app->post('/urls', function ($request, $response) use ($router) {
             return $response->withHeader('Location', $router->urlFor('showUrl', ['id' => $id]))->withStatus(301);
         }
     } else {
-        if ($url['name'] == NULL) {
+        if ($url['name'] == null) {
             $error = "URL не должен быть пустым";
         } else {
             $error = "Некорректный URL";
