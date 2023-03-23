@@ -61,9 +61,12 @@ $app->get('/urls/{id}', function ($request, $response, array $args) {
         }
     }
 
+    $checks = $pdo->query("SELECT * FROM url_checks WHERE url_id = $id ORDER BY id DESC")->fetchAll();
+
     $params = [
         'url' => $url,
-        'flash' => $messages
+        'flash' => $messages,
+        'checks' => $checks
     ];
 
     return $this->get('renderer')->render($response, 'urls/show.phtml', $params);
@@ -102,7 +105,7 @@ $app->post('/urls', function ($request, $response) use ($router) {
                 return $pdo->quote($item);
             }, $arrVars));
 
-            $pdo->exec("insert into urls (name, created_at) values ($values)");
+            $pdo->exec("INSERT INTO urls (name, created_at) VALUES ($values)");
             $id = $pdo->lastInsertId();
 
             $this->get('flash')->addMessage('success', 'Страница успешно добавлена');
@@ -123,5 +126,22 @@ $app->post('/urls', function ($request, $response) use ($router) {
         return $this->get('renderer')->render($response->withStatus(422), 'index.phtml', $params);
     }
 })->setName('postUrls');
+
+$app->post('/urls/{id}/checks', function ($request, $response, array $args) use ($router) {
+    $pdo = Connection::get()->connect();
+    
+    $id = $args['id'];
+    $nowTime = Carbon::now();
+    $arrVars = [$id, $nowTime];
+
+    $stm = $pdo->prepare("INSERT INTO url_checks (url_id, created_at) VALUES (?, ?)");
+    $stm->execute($arrVars);
+    // $pdo->exec("INSERT INTO url_checks (url_id, created_at) VALUES($id, $nowTime)");
+
+    // $params = [];
+
+    // return $this->get('renderer')->render($response->withStatus(422), 'index.phtml', $params);
+    return $response->withHeader('Location', $router->urlFor('showUrl', ['id' => $id]))->withStatus(301);
+})->setName('postChecks');
 
 $app->run();
