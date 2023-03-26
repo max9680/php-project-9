@@ -7,6 +7,9 @@ use PostgreSQLTutorial\PostgreSQLCreateTable;
 use Carbon\Carbon;
 use Slim\Factory\AppFactory;
 use DI\Container;
+use GuzzleHttp\Client;
+use GuzzleHttp\Psr7;
+use GuzzleHttp\Exception\ClientException;
 
 try {
     $pdo = Connection::get()->connect();
@@ -159,5 +162,28 @@ $app->post('/urls/{id}/checks', function ($request, $response, array $args) use 
     // return $this->get('renderer')->render($response->withStatus(422), 'index.phtml', $params);
     return $response->withHeader('Location', $router->urlFor('showUrl', ['id' => $id]))->withStatus(301);
 })->setName('postChecks');
+
+$app->get('/test', function ($request, $response, array $args) {
+    
+    // echo getenv('DATABASE_URL');
+    // die;
+
+    // $client = new Client([
+    //     'base_uri' => 'http://httpbin.org',
+    //     'timeout'  => 2.0,
+    // ]);
+
+    // try {
+    //     $answer = $client->request('GET', 'https://ysdfa.ru');
+    // } catch (ClientException $e) {
+    //     // echo Psr7\Message::toString($e->getRequest());
+    //     // echo Psr7\Message::toString($e->getResponse());
+    // }
+    // var_dump($answer);
+    // echo $answer->getStatusCode();
+
+    $params = [];
+    return $this->get('renderer')->render($response->withStatus(422), 'index.phtml', $params);
+});
 
 $app->run();

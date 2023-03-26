@@ -21,20 +21,29 @@ final class Connection
     public function connect()
     {
         // чтение параметров в файле конфигурации ini
-        $params = parse_ini_file('database.ini');
+        // $params = parse_ini_file('database.ini');
+
+        $params = parse_url(getenv('DATABASE_URL'));
+        // $params = parse_url($_ENV['DATABASE_URL']);
+
         if ($params === false) {
-            throw new \Exception("Error reading database configuration file");
+            // throw new \Exception("Error reading database configuration file");
+            throw new \Exception("Error reading environment variable DATABASE_URL");
         }
 
+        $dbName = ltrim($params['path'], '/');
         // подключение к базе данных postgresql
         $conStr = sprintf(
             "pgsql:host=%s;port=%d;dbname=%s;user=%s;password=%s",
             $params['host'],
             $params['port'],
-            $params['database'],
+            $dbName,
+            // $params['database'],
             $params['user'],
-            $params['password']
+            $params['pass']
         );
+
+        var_dump($dbName);
 
         $pdo = new \PDO($conStr);
         $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
