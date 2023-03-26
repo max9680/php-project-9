@@ -43,7 +43,7 @@ final class Connection
             $params['pass']
         );
 
-        var_dump($dbName);
+        var_dump($conStr);
 
         $pdo = new \PDO($conStr);
         $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
