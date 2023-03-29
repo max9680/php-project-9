@@ -1,22 +1,9 @@
 <?php
 
-$params = parse_ini_file('./src/database.ini');
+require __DIR__ . '/vendor/autoload.php';
 
-// var_dump($params);
+use Analyzer\CheckUrl;
 
-$params = parse_url(getenv('DATABASE_URL'));
-var_dump($params);
+$check = new CheckUrl("http://yaderew.ru");
 
-$dbName = ltrim($params['path'], '/');
-
-$conStr = sprintf(
-    "pgsql:host=%s;port=%d;dbname=%s;user=%s;password=%s",
-    $params['host'],
-    $params['port'],
-    $dbName,
-    // $params['database'],
-    $params['user'],
-    $params['pass']
-);
-
-print_r($conStr);
+var_dump($check->getStatus());

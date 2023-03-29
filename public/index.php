@@ -2,14 +2,14 @@
 
 require __DIR__ . '/../vendor/autoload.php';
 
-use PostgreSQLTutorial\Connection;
-use PostgreSQLTutorial\PostgreSQLCreateTable;
+use Analyzer\Connection;
 use Carbon\Carbon;
 use Slim\Factory\AppFactory;
 use DI\Container;
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7;
-use GuzzleHttp\Exception\ClientException;
+use GuzzleHttp\Exception\RequestException;
+use GuzzleHttp\Exception\ConnectException;
 
 try {
     $pdo = Connection::get()->connect();
@@ -50,14 +50,14 @@ $app->get('/urls', function ($request, $response) {
                          url_checks.status_code AS url_checks_status_code
                          FROM urls JOIN url_checks ON urls.id = url_checks.url_id
                          WHERE urls.id = $id ORDER BY url_checks.created_at DESC LIMIT 1";
-        $lastcheck = $pdo->query($sql)->fetchAll(\PDO::FETCH_COLUMN);
-        $url['lastcheck'] = $lastcheck[0];
-        // print_r($url);
+
+        $lastcheck = $pdo->query($sql)->fetchAll();
+        $url['lastcheck'] = $lastcheck[0]['url_checks_created_at'];
+        $url['status_code'] = $lastcheck[0]['url_checks_status_code'];
         $acc[] = $url;
+
         return $acc;
     }, []);
-
-    // print_r($urlsWCheck);
 
     $params = [
         'urls' => $urlsWCheck
@@ -150,40 +150,35 @@ $app->post('/urls/{id}/checks', function ($request, $response, array $args) use 
     $pdo = Connection::get()->connect();
 
     $id = $args['id'];
+    $urlName = $pdo->query("SELECT name FROM urls WHERE id = $id")->fetchAll(\PDO::FETCH_COLUMN);
+
+    $client = new Client([
+        'timeout'  => 2.0,
+    ]);
+
+    try {
+        $answer = $client->request('GET', $urlName[0]);
+    } catch (ConnectException | RequestException $e) {
+        $error = $e->getMessage();
+    }
+
+    if (isset($error)) {
+        $this->get('flash')->addMessage('error', 'Произошла ошибка при проверке, не удалось подключиться');
+
+        return $response->withHeader('Location', $router->urlFor('showUrl', ['id' => $id]))->withStatus(301);
+    }
+
     $nowTime = Carbon::now();
-    $arrVars = [$id, $nowTime];
+    $statusCode = $answer->getStatusCode();
 
-    $stm = $pdo->prepare("INSERT INTO url_checks (url_id, created_at) VALUES (?, ?)");
+    $arrVars = [$id, $nowTime, $statusCode];
+
+    $stm = $pdo->prepare("INSERT INTO url_checks (url_id, created_at, status_code) VALUES (?, ?, ?)");
     $stm->execute($arrVars);
-    // $pdo->exec("INSERT INTO url_checks (url_id, created_at) VALUES($id, $nowTime)");
 
-    // $params = [];
+    $this->get('flash')->addMessage('success', 'Страница успешно проверена');
 
-    // return $this->get('renderer')->render($response->withStatus(422), 'index.phtml', $params);
     return $response->withHeader('Location', $router->urlFor('showUrl', ['id' => $id]))->withStatus(301);
 })->setName('postChecks');
-
-$app->get('/test', function ($request, $response, array $args) {
-    
-    // echo getenv('DATABASE_URL');
-    // die;
-
-    // $client = new Client([
-    //     'base_uri' => 'http://httpbin.org',
-    //     'timeout'  => 2.0,
-    // ]);
-
-    // try {
-    //     $answer = $client->request('GET', 'https://ysdfa.ru');
-    // } catch (ClientException $e) {
-    //     // echo Psr7\Message::toString($e->getRequest());
-    //     // echo Psr7\Message::toString($e->getResponse());
-    // }
-    // var_dump($answer);
-    // echo $answer->getStatusCode();
-
-    $params = [];
-    return $this->get('renderer')->render($response->withStatus(422), 'index.phtml', $params);
-});
 
 $app->run();

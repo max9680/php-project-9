@@ -1,6 +1,6 @@
 <?php
 
-namespace PostgreSQLTutorial;
+namespace Analyzer;
 
 /**
  * Создание класса Connection
@@ -21,9 +21,9 @@ final class Connection
     public function connect()
     {
         // чтение параметров в файле конфигурации ini
-        // $params = parse_ini_file('database.ini');
+        $params = parse_ini_file('database.ini');
 
-        $params = parse_url(getenv('DATABASE_URL'));
+        // $dbUrl = parse_url(getenv('DATABASE_URL'));
         // $params = parse_url($_ENV['DATABASE_URL']);
 
         if ($params === false) {
@@ -31,20 +31,28 @@ final class Connection
             throw new \Exception("Error reading environment variable DATABASE_URL");
         }
 
-        $dbName = ltrim($params['path'], '/');
+        // $dbName = ltrim($dbUrl['path'], '/');
+        // $host = $dbUrl['host'];
+        // $port = $dbUrl['port'];
+        // $user = $dbUrl['user'];
+        // $pass = $dbUrl['pass'];
         // подключение к базе данных postgresql
         $conStr = sprintf(
             "pgsql:host=%s;port=%d;dbname=%s;user=%s;password=%s",
+            // $host,
+            // $port,
+            // $dbName,
+            // $user,
+            // $pass
             $params['host'],
             $params['port'],
-            $dbName,
-            // $params['database'],
+            $params['database'],
             $params['user'],
             $params['pass']
         );
 
-        var_dump($conStr);
-
+//         var_dump($conStr);
+// die;
         $pdo = new \PDO($conStr);
         $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
         $pdo->setAttribute(\PDO::ATTR_DEFAULT_FETCH_MODE, \PDO::FETCH_ASSOC);
