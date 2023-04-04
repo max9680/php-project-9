@@ -10,6 +10,7 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Psr7;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Exception\ConnectException;
+use DiDom\Document;
 
 try {
     $pdo = Connection::get()->connect();
@@ -171,9 +172,15 @@ $app->post('/urls/{id}/checks', function ($request, $response, array $args) use 
     $nowTime = Carbon::now();
     $statusCode = $answer->getStatusCode();
 
-    $arrVars = [$id, $nowTime, $statusCode];
+    $document = new Document($urlName[0], true);
 
-    $stm = $pdo->prepare("INSERT INTO url_checks (url_id, created_at, status_code) VALUES (?, ?, ?)");
+    $h1 = optional($document->find('h1')[0])->text();
+    $title = optional($document->find('title')[0])->text();
+    $description = optional($document->find('meta[name=description]')[0])->getAttribute('content');
+
+    $arrVars = [$id, $nowTime, $statusCode, $h1, $title, $description];
+
+    $stm = $pdo->prepare("INSERT INTO url_checks (url_id, created_at, status_code, h1, title, description) VALUES (?, ?, ?, ?, ?, ?)");
     $stm->execute($arrVars);
 
     $this->get('flash')->addMessage('success', 'Страница успешно проверена');
