@@ -2,6 +2,8 @@
 
 namespace Analyzer;
 
+use Dotenv;
+
 /**
  * Создание класса Connection
  */
@@ -20,35 +22,43 @@ final class Connection
      */
     public function connect()
     {
+        $dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/../');
+        $dotenv->load();
+        
+        $params = parse_url($_ENV['DATABASE_URL']);
         // чтение параметров в файле конфигурации ini
-        $params = parse_ini_file('database.ini');
+        // $params = parse_ini_file('database.ini');
 
+        $dbName = ltrim($params['path'], '/');
+        $host = $params['host'];
+        $port = $params['port'];
+        $user = $params['user'];
+        $pass = $params['pass'];
+
+        // var_dump($params);
+        // die;
         // $dbUrl = parse_url(getenv('DATABASE_URL'));
         // $params = parse_url($_ENV['DATABASE_URL']);
 
-        if ($params === false) {
+        if ($host === null) {
             // throw new \Exception("Error reading database configuration file");
             throw new \Exception("Error reading environment variable DATABASE_URL");
         }
 
-        // $dbName = ltrim($dbUrl['path'], '/');
-        // $host = $dbUrl['host'];
-        // $port = $dbUrl['port'];
-        // $user = $dbUrl['user'];
-        // $pass = $dbUrl['pass'];
+
         // подключение к базе данных postgresql
         $conStr = sprintf(
             "pgsql:host=%s;port=%d;dbname=%s;user=%s;password=%s",
-            // $host,
-            // $port,
-            // $dbName,
-            // $user,
-            // $pass
-            $params['host'],
-            $params['port'],
-            $params['database'],
-            $params['user'],
-            $params['pass']
+            $host,
+            $port,
+            $dbName,
+            $user,
+            $pass
+            // $params['host'],
+            // $params['port'],
+            // $params['database'],
+            // $params['user'],
+            // $params['pass']
         );
 
 //         var_dump($conStr);
