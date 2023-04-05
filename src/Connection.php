@@ -23,7 +23,7 @@ final class Connection
     public function connect()
     {
         $dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/../');
-        $dotenv->load();
+        $dotenv->safeload();
         
         $params = parse_url($_ENV['DATABASE_URL']);
         // чтение параметров в файле конфигурации ini
