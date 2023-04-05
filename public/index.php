@@ -180,7 +180,9 @@ $app->post('/urls/{id}/checks', function ($request, $response, array $args) use 
 
     $arrVars = [$id, $nowTime, $statusCode, $h1, $title, $description];
 
-    $stm = $pdo->prepare("INSERT INTO url_checks (url_id, created_at, status_code, h1, title, description) VALUES (?, ?, ?, ?, ?, ?)");
+    $stm = $pdo->prepare("INSERT INTO
+                        url_checks (url_id, created_at, status_code, h1, title, description)
+                        VALUES (?, ?, ?, ?, ?, ?)");
     $stm->execute($arrVars);
 
     $this->get('flash')->addMessage('success', 'Страница успешно проверена');
