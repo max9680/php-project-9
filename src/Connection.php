@@ -26,8 +26,6 @@ final class Connection
         $dotenv->safeload();
         
         $params = parse_url($_ENV['DATABASE_URL']);
-        // чтение параметров в файле конфигурации ini
-        // $params = parse_ini_file('database.ini');
 
         $dbName = ltrim($params['path'], '/');
         $host = $params['host'];
@@ -35,13 +33,7 @@ final class Connection
         $user = $params['user'];
         $pass = $params['pass'];
 
-        // var_dump($params);
-        // die;
-        // $dbUrl = parse_url(getenv('DATABASE_URL'));
-        // $params = parse_url($_ENV['DATABASE_URL']);
-
         if ($host === null) {
-            // throw new \Exception("Error reading database configuration file");
             throw new \Exception("Error reading environment variable DATABASE_URL");
         }
 
@@ -54,15 +46,8 @@ final class Connection
             $dbName,
             $user,
             $pass
-            // $params['host'],
-            // $params['port'],
-            // $params['database'],
-            // $params['user'],
-            // $params['pass']
         );
 
-//         var_dump($conStr);
-// die;
         $pdo = new \PDO($conStr);
         $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
         $pdo->setAttribute(\PDO::ATTR_DEFAULT_FETCH_MODE, \PDO::FETCH_ASSOC);
