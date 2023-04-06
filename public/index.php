@@ -174,8 +174,17 @@ $app->post('/urls/{id}/checks', function ($request, $response, array $args) use 
 
     $document = new Document($urlName[0], true);
 
-    $h1 = optional($document->find('h1')[0])->text();
-    $title = optional($document->find('title')[0])->text();
+    if (isset($document->find('h1')[0])) {
+        $h1 = optional($document->find('h1')[0])->text();
+    } else {
+        $h1 = null;
+    }
+
+    if (isset($document->find('title')[0])) {
+        $title = optional($document->find('title')[0])->text();
+    } else {
+        $title = null;
+    }
 
     if (isset($document->find('meta[name=description]')[0])) {
         $description = optional($document->find('meta[name=description]')[0])->getAttribute('content');
