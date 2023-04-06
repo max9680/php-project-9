@@ -53,7 +53,7 @@ $app->get('/urls', function ($request, $response) {
                          WHERE urls.id = $id ORDER BY url_checks.created_at DESC LIMIT 1";
 
         $lastcheck = $pdo->query($sql)->fetchAll();
-        
+
         if (isset($lastcheck[0]['url_checks_created_at'])) {
             $url['lastcheck'] = $lastcheck[0]['url_checks_created_at'];
         } else {
@@ -65,7 +65,7 @@ $app->get('/urls', function ($request, $response) {
         } else {
             $url['status_code'] = null;
         }
-        
+
         $acc[] = $url;
 
         return $acc;
