@@ -176,7 +176,12 @@ $app->post('/urls/{id}/checks', function ($request, $response, array $args) use 
 
     $h1 = optional($document->find('h1')[0])->text();
     $title = optional($document->find('title')[0])->text();
-    $description = optional($document->find('meta[name=description]')[0])->getAttribute('content');
+
+    if (isset($document->find('meta[name=description]')[0])) {
+        $description = optional($document->find('meta[name=description]')[0])->getAttribute('content');
+    } else {
+        $description = null;
+    }
 
     $arrVars = [$id, $nowTime, $statusCode, $h1, $title, $description];
 
