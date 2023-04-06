@@ -46,7 +46,7 @@
                             <?= htmlspecialchars($url['id']) ?>
                         </td>
                         <td><a href="urls/<?= htmlspecialchars($url['id']) ?>"><?= htmlspecialchars($url['name']) ?></a></td>
-                        <td><?= htmlspecialchars($url['lastcheck']) ?></td>
+                        <td><?= htmlspecialchars($url['lastcheck'] ?? '') ?></td>
                         <td><?= htmlspecialchars($url['status_code'] ?? '') ?></td>
                     </tr>
                     <?php endforeach; ?>
