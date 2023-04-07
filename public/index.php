@@ -10,6 +10,7 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Psr7;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Exception\ConnectException;
+use GuzzleHttp\Exception\ClientException;
 use DiDom\Document;
 
 try {
@@ -165,22 +166,32 @@ $app->post('/urls/{id}/checks', function ($request, $response, array $args) use 
     $urlName = $pdo->query("SELECT name FROM urls WHERE id = $id")->fetchAll(\PDO::FETCH_COLUMN);
 
     $client = new Client([
-        'timeout'  => 2.0,
+        'timeout'  => 3.0,
     ]);
+
+    $nowTime = Carbon::now();
 
     try {
         $answer = $client->request('GET', $urlName[0]);
-    } catch (ConnectException | RequestException $e) {
-        $error = $e->getMessage();
-    }
+    } catch (RequestException $e) {
+        $responseException = $e->getResponse();
+        $statusCode = $responseException->getStatusCode();
+        
+        $arrVars = [$id, $nowTime, $statusCode];
 
-    if (isset($error)) {
+        $stm = $pdo->prepare("INSERT INTO
+                            url_checks (url_id, created_at, status_code)
+                            VALUES (?, ?, ?)");
+        $stm->execute($arrVars);
+
+        $this->get('flash')->addMessage('error', 'Проверка была выполнена успешно, но сервер ответил с ошибкой');
+        return $response->withHeader('Location', $router->urlFor('showUrl', ['id' => $id]))->withStatus(301);
+    } catch (ConnectException $e) {
         $this->get('flash')->addMessage('error', 'Произошла ошибка при проверке, не удалось подключиться');
 
         return $response->withHeader('Location', $router->urlFor('showUrl', ['id' => $id]))->withStatus(301);
     }
 
-    $nowTime = Carbon::now();
     $statusCode = $answer->getStatusCode();
 
     $document = new Document($urlName[0], true);
