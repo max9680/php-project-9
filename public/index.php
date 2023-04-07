@@ -176,7 +176,7 @@ $app->post('/urls/{id}/checks', function ($request, $response, array $args) use 
     } catch (RequestException $e) {
         $responseException = $e->getResponse();
         $statusCode = $responseException->getStatusCode();
-        
+
         $arrVars = [$id, $nowTime, $statusCode];
 
         $stm = $pdo->prepare("INSERT INTO
