@@ -171,7 +171,7 @@ $app->post('/urls/{id}/checks', function ($request, $response, array $args) use 
     } catch (RequestException $e) {
         $responseException = $e->getResponse();
 
-        if (isset($responseException->getStatusCode())) {
+        if (is_numeric($responseException->getStatusCode())) {
             $statusCode = $responseException->getStatusCode();
         } else {
             $statusCode = null;
