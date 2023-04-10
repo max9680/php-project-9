@@ -85,13 +85,8 @@ $app->get('/urls/{id}', function ($request, $response, array $args) {
     $messages = $this->get('flash')->getMessages();
 
     $id = $args['id'];
-    $urls = $pdo->query("SELECT * FROM urls")->fetchAll();
-
-    foreach ($urls as $item) {
-        if ($item['id'] == $id) {
-            $url = $item;
-        }
-    }
+    // $urls = $pdo->query("SELECT * FROM urls")->fetchAll();
+    $url = $pdo->query("SELECT * FROM urls WHERE id = $id", PDO::FETCH_ASSOC)->fetchAll()[0];
 
     $checks = $pdo->query("SELECT * FROM url_checks WHERE url_id = $id ORDER BY id DESC")->fetchAll();
 
