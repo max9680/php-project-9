@@ -38,15 +38,15 @@
             <form action="/urls" method="post" class="row" required="">
                 <div class="col-8">
                         <?php if (!isset($error)) : ?>
-                            <input type="submit" name="url[name]" class="form-control form-control-lg" id="floatingInputValue" placeholder="https://www.example.com">
+                            <input type="text" name="url[name]" class="form-control form-control-lg" id="floatingInputValue" placeholder="https://www.example.com">
                         <?php endif; ?>
                         <?php if (isset($error)) : ?>
-                            <input type="submit" name="url[name]" value="<?php echo $url['name']; ?>" class="form-control form-control-lg is-invalid" id="floatingInputValue" placeholder="https://www.example.com">
+                            <input type="text" name="url[name]" value="<?php echo $url['name']; ?>" class="form-control form-control-lg is-invalid" id="floatingInputValue" placeholder="https://www.example.com">
                             <div class="invalid-feedback"><?php echo $error; ?></div>
                         <?php endif; ?>
                 </div>
                 <div class="col-2">
-                    <button class="btn btn-primary btn-lg text-uppercase ms-3 px-5 mx-3" type="submit">Проверить</button>
+                    <input type="submit" class="btn btn-primary btn-lg text-uppercase ms-3 px-5 mx-3" value="Проверить">
                 </div>
             </form>
         </div>
