@@ -170,7 +170,14 @@ $app->post('/urls/{id}/checks', function ($request, $response, array $args) use 
         $answer = $client->request('GET', $urlName[0]);
     } catch (RequestException $e) {
         $responseException = $e->getResponse();
-        $statusCode = $responseException->getStatusCode();
+
+        if (isset($responseException->getStatusCode())) {
+            $statusCode = $responseException->getStatusCode();;
+        } else {
+            $statusCode = null;
+        }
+
+        
 
         $arrVars = [$id, $nowTime, $statusCode];
 
