@@ -172,12 +172,10 @@ $app->post('/urls/{id}/checks', function ($request, $response, array $args) use 
         $responseException = $e->getResponse();
 
         if (isset($responseException->getStatusCode())) {
-            $statusCode = $responseException->getStatusCode();;
+            $statusCode = $responseException->getStatusCode();
         } else {
             $statusCode = null;
         }
-
-        
 
         $arrVars = [$id, $nowTime, $statusCode];
 
