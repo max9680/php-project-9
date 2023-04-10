@@ -24,7 +24,7 @@ final class Connection
     {
         $dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/../');
         $dotenv->safeload();
-        
+
         $params = parse_url($_ENV['DATABASE_URL']);
 
         $dbName = ltrim($params['path'], '/');
@@ -70,6 +70,5 @@ final class Connection
 
     protected function __construct()
     {
-
     }
 }
