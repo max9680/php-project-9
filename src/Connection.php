@@ -33,7 +33,7 @@ final class Connection
         $user = $params['user'];
         $pass = $params['pass'];
 
-        if ($host === null) {
+        if ($host === "") {
             throw new \Exception("Error reading environment variable DATABASE_URL");
         }
 
