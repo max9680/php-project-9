@@ -31,6 +31,7 @@ $container->set('flash', function () {
 });
 
 $app = AppFactory::createFromContainer($container);
+
 $app->addErrorMiddleware(true, true, true);
 
 $app->get('/', function ($request, $response) {
@@ -85,7 +86,7 @@ $app->get('/urls/{id}', function ($request, $response, array $args) {
     $messages = $this->get('flash')->getMessages();
 
     $id = $args['id'];
-    // $urls = $pdo->query("SELECT * FROM urls")->fetchAll();
+
     $url = $pdo->query("SELECT * FROM urls WHERE id = $id", PDO::FETCH_ASSOC)->fetchAll()[0];
 
     $checks = $pdo->query("SELECT * FROM url_checks WHERE url_id = $id ORDER BY id DESC")->fetchAll();
@@ -174,14 +175,30 @@ $app->post('/urls/{id}/checks', function ($request, $response, array $args) use 
             $statusCode = $e->getResponse()->getStatusCode();
         }
 
-        $arrVars = [$id, $nowTime, $statusCode];
+        $content = $e->getResponse()->getBody()->getContents();
+
+        $document = new Document($content);
+
+        if (isset($document->find('h1')[0])) {
+            $h1 = optional($document->find('h1')[0])->text();
+        } else {
+            $h1 = null;
+        }
+
+        if (isset($document->find('title')[0])) {
+            $title = optional($document->find('title')[0])->text();
+        } else {
+            $title = null;
+        }
+
+        $arrVars = [$id, $nowTime, $statusCode, $h1, $title, $description];
 
         $stm = $pdo->prepare("INSERT INTO
-                            url_checks (url_id, created_at, status_code)
-                            VALUES (?, ?, ?)");
+                            url_checks (url_id, created_at, status_code, h1, title, description)
+                            VALUES (?, ?, ?, ?, ?, ?)");
         $stm->execute($arrVars);
 
-        $this->get('flash')->addMessage('error', 'Проверка была выполнена успешно, но сервер ответил с ошибкой');
+        $this->get('flash')->addMessage('warning', 'Проверка была выполнена успешно, но сервер ответил с ошибкой');
         return $response->withHeader('Location', $router->urlFor('showUrl', ['id' => $id]))->withStatus(301);
     } catch (ConnectException $e) {
         $this->get('flash')->addMessage('error', 'Произошла ошибка при проверке, не удалось подключиться');
