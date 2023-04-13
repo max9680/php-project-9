@@ -171,36 +171,37 @@ $app->post('/urls/{id}/checks', function ($request, $response, array $args) use 
         $answer = $client->request('GET', $urlName[0]);
     } catch (RequestException $e) {
         $statusCode = null;
+
         if ($e->getResponse() !== null) {
             $statusCode = $e->getResponse()->getStatusCode();
             $content = $e->getResponse()->getBody()->getContents();
             $document = new Document($content);
+
+            if (isset($document->find('h1')[0])) {
+                $h1 = optional($document->find('h1')[0])->text();
+            } else {
+                $h1 = null;
+            }
+    
+            if (isset($document->find('title')[0])) {
+                $title = optional($document->find('title')[0])->text();
+            } else {
+                $title = null;
+            }
+    
+            if (isset($document->find('meta[name=description]')[0])) {
+                $description = optional($document->find('meta[name=description]')[0])->getAttribute('content');
+            } else {
+                $description = null;
+            }
+    
+            $arrVars = [$id, $nowTime, $statusCode, $h1, $title, $description];
+    
+            $stm = $pdo->prepare("INSERT INTO
+                                url_checks (url_id, created_at, status_code, h1, title, description)
+                                VALUES (?, ?, ?, ?, ?, ?)");
+            $stm->execute($arrVars);
         }
-
-        if (isset($document->find('h1')[0])) {
-            $h1 = optional($document->find('h1')[0])->text();
-        } else {
-            $h1 = null;
-        }
-
-        if (isset($document->find('title')[0])) {
-            $title = optional($document->find('title')[0])->text();
-        } else {
-            $title = null;
-        }
-
-        if (isset($document->find('meta[name=description]')[0])) {
-            $description = optional($document->find('meta[name=description]')[0])->getAttribute('content');
-        } else {
-            $description = null;
-        }
-
-        $arrVars = [$id, $nowTime, $statusCode, $h1, $title, $description];
-
-        $stm = $pdo->prepare("INSERT INTO
-                            url_checks (url_id, created_at, status_code, h1, title, description)
-                            VALUES (?, ?, ?, ?, ?, ?)");
-        $stm->execute($arrVars);
 
         $this->get('flash')->addMessage('warning', 'Проверка была выполнена успешно, но сервер ответил с ошибкой');
         return $response->withHeader('Location', $router->urlFor('showUrl', ['id' => $id]))->withStatus(301);
