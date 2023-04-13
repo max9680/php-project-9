@@ -174,9 +174,8 @@ $app->post('/urls/{id}/checks', function ($request, $response, array $args) use 
         if ($e->getResponse() !== null) {
             $statusCode = $e->getResponse()->getStatusCode();
             $content = $e->getResponse()->getBody()->getContents();
+            $document = new Document($content);
         }
-
-        $document = new Document($content);
 
         if (isset($document->find('h1')[0])) {
             $h1 = optional($document->find('h1')[0])->text();
