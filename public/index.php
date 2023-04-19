@@ -110,10 +110,11 @@ $app->post('/urls', function ($request, $response) use ($router, $pdo) {
     $v->rules([
         'url' => [
             ['website']
-        ]
+        ],
+        'required' => ['website']
     ]);
 
-    if (($v->validate()) & ($url['name'] != null)) {
+    if ($v->validate()) {
         $parsedUrl = parse_url($url['name']);
         $urlForInput = $parsedUrl['scheme'] . '://' . $parsedUrl['host'];
 
