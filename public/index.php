@@ -212,8 +212,9 @@ $app->post('/urls/{id}/checks', function ($request, $response, array $args) use 
     }
 
     $statusCode = $answer->getStatusCode();
+    $html = $answer->getBody()->getContents();
 
-    $document = new Document($urlName[0], true);
+    $document = new Document($html, false);
 
     if (isset($document->find('h1')[0])) {
         $h1 = optional($document->find('h1')[0])->text();
