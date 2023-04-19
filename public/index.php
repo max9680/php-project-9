@@ -40,9 +40,7 @@ $app->get('/', function ($request, $response) {
 });
 
 
-$app->get('/urls', function ($request, $response) {
-
-    $pdo = Connection::get()->connect();
+$app->get('/urls', function ($request, $response) use ($pdo) {
 
     $urls = $pdo->query("SELECT * FROM urls ORDER BY id DESC")->fetchAll(\PDO::FETCH_ASSOC);
 
@@ -80,9 +78,7 @@ $app->get('/urls', function ($request, $response) {
     return $this->get('renderer')->render($response, 'urls/index.phtml', $params);
 })->setName('urls');
 
-$app->get('/urls/{id}', function ($request, $response, array $args) {
-    $pdo = Connection::get()->connect();
-
+$app->get('/urls/{id}', function ($request, $response, array $args) use ($pdo) {
     $messages = $this->get('flash')->getMessages();
 
     $id = $args['id'];
@@ -102,8 +98,7 @@ $app->get('/urls/{id}', function ($request, $response, array $args) {
 
 $router = $app->getRouteCollector()->getRouteParser();
 
-$app->post('/urls', function ($request, $response) use ($router) {
-    $pdo = Connection::get()->connect();
+$app->post('/urls', function ($request, $response) use ($router, $pdo) {
     $url = $request->getParsedBodyParam('url');
 
     $v = new Valitron\Validator(['website' => $url['name']]);
@@ -155,9 +150,7 @@ $app->post('/urls', function ($request, $response) use ($router) {
     }
 })->setName('postUrls');
 
-$app->post('/urls/{id}/checks', function ($request, $response, array $args) use ($router) {
-    $pdo = Connection::get()->connect();
-
+$app->post('/urls/{id}/checks', function ($request, $response, array $args) use ($router, $pdo) {
     $id = $args['id'];
     $urlName = $pdo->query("SELECT name FROM urls WHERE id = $id")->fetchAll(\PDO::FETCH_COLUMN);
 
