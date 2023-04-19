@@ -47,21 +47,22 @@ $app->get('/urls', function ($request, $response) use ($pdo) {
     $urlsWCheck = array_reduce($urls, function ($acc, $url) use ($pdo) {
         $id = $url['id'];
 
-        $sql = "SELECT url_checks.created_at AS url_checks_created_at,
-                         url_checks.status_code AS url_checks_status_code
-                         FROM urls JOIN url_checks ON urls.id = url_checks.url_id
-                         WHERE urls.id = $id ORDER BY url_checks.created_at DESC LIMIT 1";
+        $sqlForCheck = "SELECT status_code, created_at
+                        FROM url_checks
+                        WHERE url_id = $id
+                        ORDER BY created_at
+                        DESC LIMIT 1";
 
-        $lastcheck = $pdo->query($sql)->fetchAll();
+        $lastcheck = $pdo->query($sqlForCheck)->fetchAll();
 
-        if (isset($lastcheck[0]['url_checks_created_at'])) {
-            $url['lastcheck'] = $lastcheck[0]['url_checks_created_at'];
+        if (isset($lastcheck[0]['created_at'])) {
+            $url['lastcheck'] = $lastcheck[0]['created_at'];
         } else {
             $url['lastcheck'] = null;
         }
 
-        if (isset($lastcheck[0]['url_checks_status_code'])) {
-            $url['status_code'] = $lastcheck[0]['url_checks_status_code'];
+        if (isset($lastcheck[0]['status_code'])) {
+            $url['status_code'] = $lastcheck[0]['status_code'];
         } else {
             $url['status_code'] = null;
         }
