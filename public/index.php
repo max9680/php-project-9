@@ -13,8 +13,11 @@ use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\ClientException;
 use DiDom\Document;
 
+$pdo = Connection::get();
+
 try {
-    $pdo = Connection::get()->connect();
+    $pdo = $pdo->connect();
+    // $pdo = Connection::get()->connect();
     // echo 'A connection to the PostgreSQL database sever has been established successfully.';
 } catch (\PDOException $e) {
     echo $e->getMessage();
