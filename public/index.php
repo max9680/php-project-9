@@ -87,7 +87,7 @@ $app->get('/urls/{id}', function ($request, $response, array $args) use ($pdo) {
 
     $id = $args['id'];
 
-    $url = $pdo->query("SELECT * FROM urls WHERE id = $id", PDO::FETCH_ASSOC)->fetchAll()[0];
+    $url = $pdo->query("SELECT * FROM urls WHERE id = $id", PDO::FETCH_ASSOC)->fetch();
 
     $checks = $pdo->query("SELECT * FROM url_checks WHERE url_id = $id ORDER BY id DESC")->fetchAll();
 
