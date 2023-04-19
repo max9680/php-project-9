@@ -80,7 +80,7 @@ $app->get('/urls', function ($request, $response) use ($pdo) {
     ];
 
     return $this->get('renderer')->render($response, 'urls/index.phtml', $params);
-})->setName('urls');
+})->setName('urls.index');
 
 $app->get('/urls/{id}', function ($request, $response, array $args) use ($pdo) {
     $messages = $this->get('flash')->getMessages();
@@ -98,7 +98,7 @@ $app->get('/urls/{id}', function ($request, $response, array $args) use ($pdo) {
     ];
 
     return $this->get('renderer')->render($response, 'urls/show.phtml', $params);
-})->setName('showUrl');
+})->setName('urls.show');
 
 $router = $app->getRouteCollector()->getRouteParser();
 
@@ -125,7 +125,7 @@ $app->post('/urls', function ($request, $response) use ($router, $pdo) {
 
             $id = $urls[0];
 
-            return $response->withHeader('Location', $router->urlFor('showUrl', ['id' => $id]))->withStatus(301);
+            return $response->withHeader('Location', $router->urlFor('urls.show', ['id' => $id]))->withStatus(301);
         } else {
             $nowTime = Carbon::now();
             $arrVars = [$urlForInput, $nowTime];
@@ -138,7 +138,7 @@ $app->post('/urls', function ($request, $response) use ($router, $pdo) {
 
             $this->get('flash')->addMessage('success', 'Страница успешно добавлена');
 
-            return $response->withHeader('Location', $router->urlFor('showUrl', ['id' => $id]))->withStatus(301);
+            return $response->withHeader('Location', $router->urlFor('urls.show', ['id' => $id]))->withStatus(301);
         }
     } else {
         if ($url['name'] == null) {
@@ -153,7 +153,7 @@ $app->post('/urls', function ($request, $response) use ($router, $pdo) {
 
         return $this->get('renderer')->render($response->withStatus(422), 'index.phtml', $params);
     }
-})->setName('postUrls');
+})->setName('urls.store');
 
 $app->post('/urls/{id}/checks', function ($request, $response, array $args) use ($router, $pdo) {
     $id = $args['id'];
@@ -202,11 +202,11 @@ $app->post('/urls/{id}/checks', function ($request, $response, array $args) use 
         }
 
         $this->get('flash')->addMessage('warning', 'Проверка была выполнена успешно, но сервер ответил с ошибкой');
-        return $response->withHeader('Location', $router->urlFor('showUrl', ['id' => $id]))->withStatus(301);
+        return $response->withHeader('Location', $router->urlFor('urls.show', ['id' => $id]))->withStatus(301);
     } catch (ConnectException $e) {
         $this->get('flash')->addMessage('error', 'Произошла ошибка при проверке, не удалось подключиться');
 
-        return $response->withHeader('Location', $router->urlFor('showUrl', ['id' => $id]))->withStatus(301);
+        return $response->withHeader('Location', $router->urlFor('urls.show', ['id' => $id]))->withStatus(301);
     }
 
     $statusCode = $answer->getStatusCode();
@@ -241,7 +241,7 @@ $app->post('/urls/{id}/checks', function ($request, $response, array $args) use 
 
     $this->get('flash')->addMessage('success', 'Страница успешно проверена');
 
-    return $response->withHeader('Location', $router->urlFor('showUrl', ['id' => $id]))->withStatus(301);
-})->setName('postChecks');
+    return $response->withHeader('Location', $router->urlFor('urls.show', ['id' => $id]))->withStatus(301);
+})->setName('checks.store');
 
 $app->run();
