@@ -114,33 +114,7 @@ $app->post('/urls', function ($request, $response) use ($router, $pdo) {
         'required' => ['website']
     ]);
 
-    if ($v->validate()) {
-        $parsedUrl = parse_url($url['name']);
-        $urlForInput = $parsedUrl['scheme'] . '://' . $parsedUrl['host'];
-
-        $urls = $pdo->query("SELECT id FROM urls WHERE name = '$urlForInput'")->fetchAll(\PDO::FETCH_COLUMN);
-
-        if (count($urls) > 0) {
-            $this->get('flash')->addMessage('success', 'Страница уже существует');
-
-            $id = $urls[0];
-
-            return $response->withHeader('Location', $router->urlFor('urls.show', ['id' => $id]))->withStatus(301);
-        } else {
-            $nowTime = Carbon::now();
-            $arrVars = [$urlForInput, $nowTime];
-            $values = implode(', ', array_map(function ($item) use ($pdo) {
-                return $pdo->quote($item);
-            }, $arrVars));
-
-            $pdo->exec("INSERT INTO urls (name, created_at) VALUES ($values)");
-            $id = $pdo->lastInsertId();
-
-            $this->get('flash')->addMessage('success', 'Страница успешно добавлена');
-
-            return $response->withHeader('Location', $router->urlFor('urls.show', ['id' => $id]))->withStatus(301);
-        }
-    } else {
+    if (!$v->validate()) {
         if ($url['name'] == null) {
             $error = "URL не должен быть пустым";
         } else {
@@ -153,6 +127,32 @@ $app->post('/urls', function ($request, $response) use ($router, $pdo) {
 
         return $this->get('renderer')->render($response->withStatus(422), 'index.phtml', $params);
     }
+    
+    $parsedUrl = parse_url($url['name']);
+    $urlForInput = $parsedUrl['scheme'] . '://' . $parsedUrl['host'];
+
+    $urls = $pdo->query("SELECT id FROM urls WHERE name = '$urlForInput'")->fetchAll(\PDO::FETCH_COLUMN);
+
+    if (count($urls) > 0) {
+        $this->get('flash')->addMessage('success', 'Страница уже существует');
+
+        $id = $urls[0];
+
+        return $response->withHeader('Location', $router->urlFor('urls.show', ['id' => $id]))->withStatus(301);
+    }
+    
+    $nowTime = Carbon::now();
+    $arrVars = [$urlForInput, $nowTime];
+    $values = implode(', ', array_map(function ($item) use ($pdo) {
+        return $pdo->quote($item);
+    }, $arrVars));
+
+    $pdo->exec("INSERT INTO urls (name, created_at) VALUES ($values)");
+    $id = $pdo->lastInsertId();
+
+    $this->get('flash')->addMessage('success', 'Страница успешно добавлена');
+
+    return $response->withHeader('Location', $router->urlFor('urls.show', ['id' => $id]))->withStatus(301);
 })->setName('urls.store');
 
 $app->post('/urls/{id}/checks', function ($request, $response, array $args) use ($router, $pdo) {
