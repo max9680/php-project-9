@@ -127,7 +127,7 @@ $app->post('/urls', function ($request, $response) use ($router, $pdo) {
 
         return $this->get('renderer')->render($response->withStatus(422), 'index.phtml', $params);
     }
-    
+
     $parsedUrl = parse_url($url['name']);
     $urlForInput = $parsedUrl['scheme'] . '://' . $parsedUrl['host'];
 
@@ -140,7 +140,7 @@ $app->post('/urls', function ($request, $response) use ($router, $pdo) {
 
         return $response->withHeader('Location', $router->urlFor('urls.show', ['id' => $id]))->withStatus(301);
     }
-    
+
     $nowTime = Carbon::now();
     $arrVars = [$urlForInput, $nowTime];
     $values = implode(', ', array_map(function ($item) use ($pdo) {
