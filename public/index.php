@@ -53,33 +53,15 @@ $app->get('/urls', function ($request, $response) {
 
     $urls = $this->get('pdo')->query("SELECT * FROM urls ORDER BY id DESC")->fetchAll();
 
-    $urlsWCheck = array_reduce($urls, function ($acc, $url) {
-        $id = $url['id'];
+    $checks = $this->get('pdo')->query("SELECT * FROM url_checks ORDER BY id DESC")->fetchAll();
 
-        $sqlForCheck = "SELECT status_code, created_at
-                        FROM url_checks
-                        WHERE url_id = $id
-                        ORDER BY created_at
-                        DESC LIMIT 1";
-
-        $lastcheck = $this->get('pdo')->query($sqlForCheck)->fetchAll();
-
-        if (isset($lastcheck[0]['created_at'])) {
-            $url['lastcheck'] = $lastcheck[0]['created_at'];
-        } else {
-            $url['lastcheck'] = null;
-        }
-
-        if (isset($lastcheck[0]['status_code'])) {
-            $url['status_code'] = $lastcheck[0]['status_code'];
-        } else {
-            $url['status_code'] = null;
-        }
-
-        $acc[] = $url;
-
-        return $acc;
-    }, []);
+    $urlsWCheck = array_map(function ($url) use ($checks) {
+        $resultArray = $url;
+        $check = collect($checks)->firstWhere('url_id', $url['id']);
+        $resultArray['lastcheck'] = $check['created_at'];
+        $resultArray['status_code'] = $check['status_code'];
+        return $resultArray;
+    }, $urls);
 
     $params = [
         'urls' => $urlsWCheck
@@ -118,7 +100,7 @@ $app->post('/urls', function ($request, $response) use ($router) {
 
     if (!$v->validate()) {
         $errors = $v->errors();
-        // print_r($v->errors());
+        print_r($v->errors());
         $params = [
             'error' => $errors['URL'][0],
             'url' => $url
