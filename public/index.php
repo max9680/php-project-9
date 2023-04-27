@@ -13,6 +13,8 @@ use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\ClientException;
 use DiDom\Document;
 
+Valitron\Validator::lang('ru');
+
 $container = new Container();
 
 session_start();
@@ -109,18 +111,18 @@ $router = $app->getRouteCollector()->getRouteParser();
 $app->post('/urls', function ($request, $response) use ($router) {
     $url = $request->getParsedBodyParam('url');
 
-    $v = new Valitron\Validator(['website' => $url['name']]);
+    $v = new Valitron\Validator(['URL' => $url['name']]);
 
     $v->rules([
-        'required' => ['website'],
+        'required' => ['URL'],
         'url' => [
-            ['website']
+            ['URL']
         ]
     ]);
 
     if (!$v->validate()) {
         $params = [
-            'error' => $v->errors()['website'][0],
+            'error' => $v->errors()['URL'][0],
             'url' => $url
         ];
 
