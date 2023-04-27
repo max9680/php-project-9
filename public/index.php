@@ -52,7 +52,7 @@ $app->get('/urls', function ($request, $response) {
     // $urls = $pdo->query("SELECT * FROM urls ORDER BY id DESC")->fetchAll(\PDO::FETCH_ASSOC);
     $urls = $this->get('pdo')->query("SELECT * FROM urls ORDER BY id DESC")->fetchAll(\PDO::FETCH_ASSOC);
 
-    $urlsWCheck = array_reduce($urls, function ($acc, $url) use ($pdo) {
+    $urlsWCheck = array_reduce($urls, function ($acc, $url) {
         $id = $url['id'];
 
         $sqlForCheck = "SELECT status_code, created_at
