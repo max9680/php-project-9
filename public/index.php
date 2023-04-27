@@ -20,7 +20,7 @@ session_start();
 $container->set('pdo', function () {
 
     $pdo = Connection::get();
-    
+
     try {
         $pdo = $pdo->connect();
         // echo 'A connection to the PostgreSQL database sever has been established successfully.';
