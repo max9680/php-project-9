@@ -155,11 +155,11 @@ $app->post('/urls/{id}/checks', function ($request, $response, array $args) use 
             $content = $e->getResponse()->getBody()->getContents();
             $document = new Document($content);
 
-            if (isset($document->find('h1')[0])) {
+            // if (isset($document->find('h1')[0])) {
                 $h1 = optional($document->find('h1')[0])->text();
-            } else {
-                $h1 = null;
-            }
+            // } else {
+            //     $h1 = null;
+            // }
 
             if (isset($document->find('title')[0])) {
                 $title = optional($document->find('title')[0])->text();
