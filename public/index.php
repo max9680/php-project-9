@@ -117,10 +117,10 @@ $app->post('/urls', function ($request, $response) use ($router) {
     $v->rule('url', 'URL')->message('Некорректный {field}');
 
     if (!$v->validate()) {
-
+        $errors = $v->errors();
         // print_r($v->errors());
         $params = [
-            'error' => $v->errors()['URL'][0],
+            'error' => $errors['URL'][0],
             'url' => $url
         ];
 
