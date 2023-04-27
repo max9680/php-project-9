@@ -100,7 +100,6 @@ $app->post('/urls', function ($request, $response) use ($router) {
 
     if (!$v->validate()) {
         $errors = $v->errors();
-        print_r($v->errors());
         $params = [
             'error' => $errors['URL'][0],
             'url' => $url
