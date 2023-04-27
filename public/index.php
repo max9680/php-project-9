@@ -113,12 +113,8 @@ $app->post('/urls', function ($request, $response) use ($router) {
 
     $v = new Valitron\Validator(['URL' => $url['name']]);
 
-    $v->rules([
-        'required' => ['URL'],
-        'url' => [
-            ['URL']
-        ]
-    ]);
+    $v->rule('required', 'URL')->message('{field} не должен быть пустым');
+    $v->rule('url', 'URL')->message('Некорректный {field}');
 
     if (!$v->validate()) {
         $params = [
