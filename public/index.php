@@ -49,8 +49,7 @@ $app->get('/', function ($request, $response) {
 
 $app->get('/urls', function ($request, $response) {
 
-    // $urls = $pdo->query("SELECT * FROM urls ORDER BY id DESC")->fetchAll(\PDO::FETCH_ASSOC);
-    $urls = $this->get('pdo')->query("SELECT * FROM urls ORDER BY id DESC")->fetchAll(\PDO::FETCH_ASSOC);
+    $urls = $this->get('pdo')->query("SELECT * FROM urls ORDER BY id DESC")->fetchAll();
 
     $urlsWCheck = array_reduce($urls, function ($acc, $url) {
         $id = $url['id'];
@@ -92,7 +91,7 @@ $app->get('/urls/{id}', function ($request, $response, array $args) {
 
     $id = $args['id'];
 
-    $url = $this->get('pdo')->query("SELECT * FROM urls WHERE id = $id", PDO::FETCH_ASSOC)->fetch();
+    $url = $this->get('pdo')->query("SELECT * FROM urls WHERE id = $id")->fetch();
 
     $checks = $this->get('pdo')->query("SELECT * FROM url_checks WHERE url_id = $id ORDER BY id DESC")->fetchAll();
 
