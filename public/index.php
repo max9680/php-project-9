@@ -13,18 +13,23 @@ use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\ClientException;
 use DiDom\Document;
 
-$pdo = Connection::get();
-
-try {
-    $pdo = $pdo->connect();
-    // echo 'A connection to the PostgreSQL database sever has been established successfully.';
-} catch (\PDOException $e) {
-    echo $e->getMessage();
-}
+$container = new Container();
 
 session_start();
 
-$container = new Container();
+$container->set('pdo', function () {
+
+    $pdo = Connection::get();
+    
+    try {
+        $pdo = $pdo->connect();
+        // echo 'A connection to the PostgreSQL database sever has been established successfully.';
+    } catch (\PDOException $e) {
+        echo $e->getMessage();
+    }
+    return $pdo;
+});
+
 $container->set('renderer', function () {
     return new \Slim\Views\PhpRenderer(__DIR__ . '/../templates');
 });
@@ -42,9 +47,10 @@ $app->get('/', function ($request, $response) {
 });
 
 
-$app->get('/urls', function ($request, $response) use ($pdo) {
+$app->get('/urls', function ($request, $response) {
 
-    $urls = $pdo->query("SELECT * FROM urls ORDER BY id DESC")->fetchAll(\PDO::FETCH_ASSOC);
+    // $urls = $pdo->query("SELECT * FROM urls ORDER BY id DESC")->fetchAll(\PDO::FETCH_ASSOC);
+    $urls = $this->get('pdo')->query("SELECT * FROM urls ORDER BY id DESC")->fetchAll(\PDO::FETCH_ASSOC);
 
     $urlsWCheck = array_reduce($urls, function ($acc, $url) use ($pdo) {
         $id = $url['id'];
@@ -55,7 +61,7 @@ $app->get('/urls', function ($request, $response) use ($pdo) {
                         ORDER BY created_at
                         DESC LIMIT 1";
 
-        $lastcheck = $pdo->query($sqlForCheck)->fetchAll();
+        $lastcheck = $this->get('pdo')->query($sqlForCheck)->fetchAll();
 
         if (isset($lastcheck[0]['created_at'])) {
             $url['lastcheck'] = $lastcheck[0]['created_at'];
@@ -81,14 +87,14 @@ $app->get('/urls', function ($request, $response) use ($pdo) {
     return $this->get('renderer')->render($response, 'urls/index.phtml', $params);
 })->setName('urls.index');
 
-$app->get('/urls/{id}', function ($request, $response, array $args) use ($pdo) {
+$app->get('/urls/{id}', function ($request, $response, array $args) {
     $messages = $this->get('flash')->getMessages();
 
     $id = $args['id'];
 
-    $url = $pdo->query("SELECT * FROM urls WHERE id = $id", PDO::FETCH_ASSOC)->fetch();
+    $url = $this->get('pdo')->query("SELECT * FROM urls WHERE id = $id", PDO::FETCH_ASSOC)->fetch();
 
-    $checks = $pdo->query("SELECT * FROM url_checks WHERE url_id = $id ORDER BY id DESC")->fetchAll();
+    $checks = $this->get('pdo')->query("SELECT * FROM url_checks WHERE url_id = $id ORDER BY id DESC")->fetchAll();
 
     $params = [
         'url' => $url,
@@ -101,7 +107,7 @@ $app->get('/urls/{id}', function ($request, $response, array $args) use ($pdo) {
 
 $router = $app->getRouteCollector()->getRouteParser();
 
-$app->post('/urls', function ($request, $response) use ($router, $pdo) {
+$app->post('/urls', function ($request, $response) use ($router) {
     $url = $request->getParsedBodyParam('url');
 
     $v = new Valitron\Validator(['website' => $url['name']]);
@@ -130,7 +136,7 @@ $app->post('/urls', function ($request, $response) use ($router, $pdo) {
     $parsedUrl = parse_url($url['name']);
     $urlForInput = $parsedUrl['scheme'] . '://' . $parsedUrl['host'];
 
-    $urls = $pdo->query("SELECT id FROM urls WHERE name = '$urlForInput'")->fetchAll(\PDO::FETCH_COLUMN);
+    $urls = $this->get('pdo')->query("SELECT id FROM urls WHERE name = '$urlForInput'")->fetchAll(\PDO::FETCH_COLUMN);
 
     if (count($urls) > 0) {
         $this->get('flash')->addMessage('success', 'Страница уже существует');
@@ -142,21 +148,21 @@ $app->post('/urls', function ($request, $response) use ($router, $pdo) {
 
     $nowTime = Carbon::now();
     $arrVars = [$urlForInput, $nowTime];
-    $values = implode(', ', array_map(function ($item) use ($pdo) {
-        return $pdo->quote($item);
+    $values = implode(', ', array_map(function ($item) {
+        return $this->get('pdo')->quote($item);
     }, $arrVars));
 
-    $pdo->exec("INSERT INTO urls (name, created_at) VALUES ($values)");
-    $id = $pdo->lastInsertId();
+    $this->get('pdo')->exec("INSERT INTO urls (name, created_at) VALUES ($values)");
+    $id = $this->get('pdo')->lastInsertId();
 
     $this->get('flash')->addMessage('success', 'Страница успешно добавлена');
 
     return $response->withHeader('Location', $router->urlFor('urls.show', ['id' => $id]))->withStatus(301);
 })->setName('urls.store');
 
-$app->post('/urls/{id}/checks', function ($request, $response, array $args) use ($router, $pdo) {
+$app->post('/urls/{id}/checks', function ($request, $response, array $args) use ($router) {
     $id = $args['id'];
-    $urlName = $pdo->query("SELECT name FROM urls WHERE id = $id")->fetchAll(\PDO::FETCH_COLUMN);
+    $urlName = $this->get('pdo')->query("SELECT name FROM urls WHERE id = $id")->fetchAll(\PDO::FETCH_COLUMN);
 
     $client = new Client([
         'timeout'  => 3.0,
@@ -194,7 +200,7 @@ $app->post('/urls/{id}/checks', function ($request, $response, array $args) use 
 
             $arrVars = [$id, $nowTime, $statusCode, $h1, $title, $description];
 
-            $stm = $pdo->prepare("INSERT INTO
+            $stm = $this->get('pdo')->prepare("INSERT INTO
                                 url_checks (url_id, created_at, status_code, h1, title, description)
                                 VALUES (?, ?, ?, ?, ?, ?)");
             $stm->execute($arrVars);
@@ -233,7 +239,7 @@ $app->post('/urls/{id}/checks', function ($request, $response, array $args) use 
 
     $arrVars = [$id, $nowTime, $statusCode, $h1, $title, $description];
 
-    $stm = $pdo->prepare("INSERT INTO
+    $stm = $this->get('pdo')->prepare("INSERT INTO
                         url_checks (url_id, created_at, status_code, h1, title, description)
                         VALUES (?, ?, ?, ?, ?, ?)");
     $stm->execute($arrVars);
