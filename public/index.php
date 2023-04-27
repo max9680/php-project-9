@@ -161,17 +161,17 @@ $app->post('/urls/{id}/checks', function ($request, $response, array $args) use 
             //     $h1 = null;
             // }
 
-            if (isset($document->find('title')[0])) {
+            // if (isset($document->find('title')[0])) {
                 $title = optional($document->find('title')[0])->text();
-            } else {
-                $title = null;
-            }
+            // } else {
+            //     $title = null;
+            // }
 
-            if (isset($document->find('meta[name=description]')[0])) {
+            // if (isset($document->find('meta[name=description]')[0])) {
                 $description = optional($document->find('meta[name=description]')[0])->getAttribute('content');
-            } else {
-                $description = null;
-            }
+            // } else {
+            //     $description = null;
+            // }
 
             $arrVars = [$id, $nowTime, $statusCode, $h1, $title, $description];
 
