@@ -59,9 +59,9 @@ $app->get('/urls', function ($request, $response) {
         $resultArray = $url;
         $check = collect($checks)->firstWhere('url_id', $url['id']);
 
-        var_dump($checks);
+        var_dump($check);
         die();
-        
+
         $resultArray['lastcheck'] = $check['created_at'];
         $resultArray['status_code'] = $check['status_code'];
         return $resultArray;
