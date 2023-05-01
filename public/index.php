@@ -55,6 +55,9 @@ $app->get('/urls', function ($request, $response) {
 
     $checks = $this->get('pdo')->query("SELECT * FROM url_checks ORDER BY id DESC")->fetchAll();
 
+    var_dump($checks);
+    die();
+
     $urlsWCheck = array_map(function ($url) use ($checks) {
         $resultArray = $url;
         $check = collect($checks)->firstWhere('url_id', $url['id']);
