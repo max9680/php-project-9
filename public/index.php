@@ -54,16 +54,17 @@ $app->get('/urls', function ($request, $response) {
     $urls = $this->get('pdo')->query("SELECT * FROM urls ORDER BY id DESC")->fetchAll();
 
     $checks = $this->get('pdo')->query("SELECT * FROM url_checks ORDER BY id DESC")->fetchAll();
+    $collectionChecks = collect($checks);
 
-    $urlsWCheck = array_map(function ($url) use ($checks) {
+    $urlsWCheck = array_map(function ($url) use ($collectionChecks) {
         $resultArray = $url;
-        $check = collect($checks)->firstWhere('url_id', $url['id']);
+        $check = $collectionChecks->firstWhere('url_id', $url['id']);
 
-        var_dump(collect($check));
-        die();
+        // var_dump($collectionChecks);
+        // die();
 
-        $resultArray['lastcheck'] = $check['created_at'];
-        $resultArray['status_code'] = $check['status_code'];
+        $resultArray['lastcheck'] = isset($check['created_at']) ? $check['created_at'] : null;
+        $resultArray['status_code'] = isset($check['status_code']) ? $check['status_code'] : null;
         return $resultArray;
     }, $urls);
 
