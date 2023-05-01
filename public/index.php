@@ -58,6 +58,10 @@ $app->get('/urls', function ($request, $response) {
     $urlsWCheck = array_map(function ($url) use ($checks) {
         $resultArray = $url;
         $check = collect($checks)->firstWhere('url_id', $url['id']);
+
+        var_dump(collect($checks));
+        die();
+
         $resultArray['lastcheck'] = $check['created_at'];
         $resultArray['status_code'] = $check['status_code'];
         return $resultArray;
