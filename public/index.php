@@ -59,10 +59,6 @@ $app->get('/urls', function ($request, $response) {
     $urlsWCheck = array_map(function ($url) use ($collectionChecks) {
         $resultArray = $url;
         $check = $collectionChecks->firstWhere('url_id', $url['id']);
-
-        // var_dump($collectionChecks);
-        // die();
-
         $resultArray['lastcheck'] = isset($check['created_at']) ? $check['created_at'] : null;
         $resultArray['status_code'] = isset($check['status_code']) ? $check['status_code'] : null;
         return $resultArray;
