@@ -38,12 +38,12 @@
     
             <form action="/urls" method="post" class="row mb-3" required="">
                 <div class="col-8">
-                        <?php if (!isset($error)) : ?>
+                        <?php if (!isset($error['URL'])) : ?>
                             <input type="text" name="url[name]" class="form-control form-control-lg" id="floatingInputValue" placeholder="https://www.example.com">
                         <?php endif; ?>
-                        <?php if (isset($error)) : ?>
+                        <?php if (isset($error['URL'])) : ?>
                             <input type="text" name="url[name]" value="<?php echo $url['name']; ?>" class="form-control form-control-lg is-invalid" id="floatingInputValue" placeholder="https://www.example.com">
-                            <div class="invalid-feedback"><?php echo $error; ?></div>
+                            <div class="invalid-feedback"><?php echo $error['URL'][0]; ?></div>
                         <?php endif; ?>
                 </div>
                 <div class="col-2">
