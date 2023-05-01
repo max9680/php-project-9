@@ -155,23 +155,9 @@ $app->post('/urls/{id}/checks', function ($request, $response, array $args) use 
             $content = $e->getResponse()->getBody()->getContents();
             $document = new Document($content);
 
-            // if (isset($document->find('h1')[0])) {
-                $h1 = optional($document->find('h1')[0])->text();
-            // } else {
-            //     $h1 = null;
-            // }
-
-            // if (isset($document->find('title')[0])) {
-                $title = optional($document->find('title')[0])->text();
-            // } else {
-            //     $title = null;
-            // }
-
-            // if (isset($document->find('meta[name=description]')[0])) {
-                $description = optional($document->find('meta[name=description]')[0])->getAttribute('content');
-            // } else {
-            //     $description = null;
-            // }
+            $h1 = optional($document->find('h1')[0])->text();
+            $title = optional($document->find('title')[0])->text();
+            $description = optional($document->find('meta[name=description]')[0])->getAttribute('content');
 
             $arrVars = [$id, $nowTime, $statusCode, $h1, $title, $description];
 
@@ -194,23 +180,9 @@ $app->post('/urls/{id}/checks', function ($request, $response, array $args) use 
 
     $document = new Document($html, false);
 
-    if (isset($document->find('h1')[0])) {
-        $h1 = optional($document->find('h1')[0])->text();
-    } else {
-        $h1 = null;
-    }
-
-    if (isset($document->find('title')[0])) {
-        $title = optional($document->find('title')[0])->text();
-    } else {
-        $title = null;
-    }
-
-    if (isset($document->find('meta[name=description]')[0])) {
-        $description = optional($document->find('meta[name=description]')[0])->getAttribute('content');
-    } else {
-        $description = null;
-    }
+    $h1 = substr(optional($document->first('h1'))->text(), 0, 255);
+    $title = substr(optional($document->first('title'))->text(), 0, 255);
+    $description = optional($document->first('meta[name=description]'))->getAttribute('content');
 
     $arrVars = [$id, $nowTime, $statusCode, $h1, $title, $description];
 
