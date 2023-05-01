@@ -59,7 +59,7 @@ $app->get('/urls', function ($request, $response) {
         $resultArray = $url;
         $check = collect($checks)->firstWhere('url_id', $url['id']);
 
-        var_dump(collect($checks));
+        var_dump(collect($check));
         die();
 
         $resultArray['lastcheck'] = $check['created_at'];
