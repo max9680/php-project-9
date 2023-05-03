@@ -78,7 +78,7 @@ $app->get('/urls/{id}', function ($request, $response, array $args) {
     $messages = $this->get('flash')->getMessages();
 
     $id = $args['id'];
-    
+
     $sql = "SELECT * FROM urls WHERE id = ?";
     $stm = $this->get('pdo')->prepare($sql);
     $stm->execute([$id]);
