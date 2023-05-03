@@ -78,10 +78,16 @@ $app->get('/urls/{id}', function ($request, $response, array $args) {
     $messages = $this->get('flash')->getMessages();
 
     $id = $args['id'];
+    
+    $sql = "SELECT * FROM urls WHERE id = ?";
+    $stm = $this->get('pdo')->prepare($sql);
+    $stm->execute([$id]);
+    $url = $stm->fetch();
 
-    $url = $this->get('pdo')->query("SELECT * FROM urls WHERE id = $id")->fetch();
-
-    $checks = $this->get('pdo')->query("SELECT * FROM url_checks WHERE url_id = $id ORDER BY id DESC")->fetchAll();
+    $sql = "SELECT * FROM url_checks WHERE url_id = ? ORDER BY id DESC";
+    $stm = $this->get('pdo')->prepare($sql);
+    $stm->execute([$id]);
+    $checks = $stm->fetchAll();
 
     $params = [
         'url' => $url,
@@ -114,7 +120,10 @@ $app->post('/urls', function ($request, $response) use ($router) {
     $parsedUrl = parse_url($url['name']);
     $urlForInput = $parsedUrl['scheme'] . '://' . $parsedUrl['host'];
 
-    $urls = $this->get('pdo')->query("SELECT id FROM urls WHERE name = '$urlForInput'")->fetchAll(\PDO::FETCH_COLUMN);
+    $sql = "SELECT id FROM urls WHERE name = ?";
+    $stm = $this->get('pdo')->prepare($sql);
+    $stm->execute([$urlForInput]);
+    $urls = $stm->fetchAll(\PDO::FETCH_COLUMN);
 
     if (count($urls) > 0) {
         $this->get('flash')->addMessage('success', 'Страница уже существует');
@@ -126,11 +135,11 @@ $app->post('/urls', function ($request, $response) use ($router) {
 
     $nowTime = Carbon::now();
     $arrVars = [$urlForInput, $nowTime];
-    $values = implode(', ', array_map(function ($item) {
-        return $this->get('pdo')->quote($item);
-    }, $arrVars));
 
-    $this->get('pdo')->exec("INSERT INTO urls (name, created_at) VALUES ($values)");
+    $sql = "INSERT INTO urls (name, created_at) VALUES (?,?)";
+    $stm = $this->get('pdo')->prepare($sql);
+    $stm->execute($arrVars);
+
     $id = $this->get('pdo')->lastInsertId();
 
     $this->get('flash')->addMessage('success', 'Страница успешно добавлена');
@@ -140,7 +149,11 @@ $app->post('/urls', function ($request, $response) use ($router) {
 
 $app->post('/urls/{id}/checks', function ($request, $response, array $args) use ($router) {
     $id = $args['id'];
-    $urlName = $this->get('pdo')->query("SELECT name FROM urls WHERE id = $id")->fetchAll(\PDO::FETCH_COLUMN);
+
+    $sql = "SELECT name FROM urls WHERE id = ?";
+    $stm = $this->get('pdo')->prepare($sql);
+    $stm->execute([$id]);
+    $urlName = $stm->fetchAll(\PDO::FETCH_COLUMN);
 
     $client = new Client([
         'timeout'  => 3.0,
