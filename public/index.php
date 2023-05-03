@@ -15,6 +15,9 @@ use DiDom\Document;
 
 Valitron\Validator::lang('ru');
 
+$dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/../');
+$dotenv->safeload();
+
 $container = new Container();
 
 session_start();

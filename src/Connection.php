@@ -22,8 +22,8 @@ final class Connection
      */
     public function connect()
     {
-        $dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/../');
-        $dotenv->safeload();
+        // $dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/../');
+        // $dotenv->safeload();
 
         $params = parse_url($_ENV['DATABASE_URL']);
 
