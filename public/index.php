@@ -155,9 +155,9 @@ $app->post('/urls/{id}/checks', function ($request, $response, array $args) use 
             $content = $e->getResponse()->getBody()->getContents();
             $document = new Document($content);
 
-            $h1 = optional($document->find('h1')[0])->text();
-            $title = optional($document->find('title')[0])->text();
-            $description = optional($document->find('meta[name=description]')[0])->getAttribute('content');
+            $h1 = optional($document->first('h1'))->text();
+            $title = optional($document->first('title'))->text();
+            $description = optional($document->first('meta[name=description]'))->getAttribute('content');
 
             $arrVars = [$id, $nowTime, $statusCode, $h1, $title, $description];
 
