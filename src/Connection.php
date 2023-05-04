@@ -4,17 +4,8 @@ namespace Analyzer;
 
 use Dotenv;
 
-/**
- * Создание класса Connection
- */
-final class Connection
+class Connection
 {
-    /**
-     * Connection
-     * тип @var
-     */
-    private static ?Connection $conn = null;
-
     /**
      * Подключение к базе данных и возврат экземпляра объекта \PDO
      * @return \PDO
@@ -22,9 +13,6 @@ final class Connection
      */
     public function connect()
     {
-        // $dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/../');
-        // $dotenv->safeload();
-
         $params = parse_url($_ENV['DATABASE_URL']);
 
         $dbName = ltrim($params['path'], '/');
@@ -36,7 +24,6 @@ final class Connection
         if ($host === "") {
             throw new \Exception("Error reading environment variable DATABASE_URL");
         }
-
 
         // подключение к базе данных postgresql
         $conStr = sprintf(
@@ -55,20 +42,7 @@ final class Connection
         return $pdo;
     }
 
-    /**
-     * возврат экземпляра объекта Connection
-     * тип @return
-     */
-    public static function get()
-    {
-        if (null === static::$conn) {
-            static::$conn = new self();
-        }
-
-        return static::$conn;
-    }
-
-    protected function __construct()
+    public function __construct()
     {
     }
 }

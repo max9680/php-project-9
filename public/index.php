@@ -24,7 +24,7 @@ session_start();
 
 $container->set('pdo', function () {
 
-    $pdo = Connection::get();
+    $pdo = new Connection();
 
     try {
         $pdo = $pdo->connect();
