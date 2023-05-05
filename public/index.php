@@ -197,17 +197,7 @@ $app->post('/urls/{id}/checks', function ($request, $response, array $args) use 
     $document = new Document($html, false);
 
     $h1 = optional($document->first('h1'))->text();
-
-    if (!is_null($h1) && strlen($h1) > 255) {
-        $h1 = substr($h1, 0, 255);
-    }
-
     $title = optional($document->first('title'))->text();
-
-    if (!is_null($title) && strlen($title) > 255) {
-        $title = substr($title, 0, 255);
-    }
-
     $description = optional($document->first('meta[name=description]'))->getAttribute('content');
 
     $arrVars = [$id, $nowTime, $statusCode, $h1, $title, $description];
