@@ -11,7 +11,8 @@ use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\ClientException;
 use DiDom\Document;
-use Dotenv;
+
+session_start();
 
 Valitron\Validator::lang('ru');
 
@@ -19,8 +20,6 @@ $dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/../');
 $dotenv->safeload();
 
 $container = new Container();
-
-session_start();
 
 $params = parse_url($_ENV['DATABASE_URL']);
 
