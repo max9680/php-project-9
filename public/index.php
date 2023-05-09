@@ -122,6 +122,7 @@ $router = $app->getRouteCollector()->getRouteParser();
 
 $app->post('/urls', function ($request, $response) use ($router) {
     $url = $request->getParsedBodyParam('url');
+    $url['name'] = strtolower($url['name']);
 
     $v = new Valitron\Validator(['URL' => $url['name']]);
 
