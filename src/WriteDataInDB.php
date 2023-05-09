@@ -2,7 +2,7 @@
 
 namespace Analyzer;
 
-function writeDataInDB($pdo, $document, $id, $nowTime, $statusCode)
+function writeDataInDB(\PDO $pdo, \DiDom\Document $document, int $id, \Carbon\Carbon $nowTime, int $statusCode)
 {
     $h1 = optional($document->first('h1'))->text();
     $title = optional($document->first('title'))->text();
