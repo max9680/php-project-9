@@ -51,7 +51,9 @@ try {
     echo $e->getMessage();
 }
 
-$container->set('pdo', $pdo);
+if (isset($pdo)) {
+    $container->set('pdo', $pdo);
+}
 
 $container->set('renderer', function () {
     return new \Slim\Views\PhpRenderer(__DIR__ . '/../templates');
