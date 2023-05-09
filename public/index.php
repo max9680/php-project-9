@@ -11,6 +11,7 @@ use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\ClientException;
 use DiDom\Document;
+use function Analyzer\writeDataInDB;
 
 session_start();
 
@@ -144,12 +145,12 @@ $app->post('/urls', function ($request, $response) use ($router) {
     $sql = "SELECT id FROM urls WHERE name = ?";
     $stm = $this->get('pdo')->prepare($sql);
     $stm->execute([$urlForInput]);
-    $urls = $stm->fetchAll(\PDO::FETCH_COLUMN);
+    $urlInDB = $stm->fetch(\PDO::FETCH_COLUMN);
 
-    if (count($urls) > 0) {
+    if (isset($urlInDB) && ($urlInDB !== false)) {
         $this->get('flash')->addMessage('success', 'Страница уже существует');
 
-        $id = $urls[0];
+        $id = $urlInDB;
 
         return $response->withHeader('Location', $router->urlFor('urls.show', ['id' => $id]))->withStatus(301);
     }
@@ -192,16 +193,7 @@ $app->post('/urls/{id}/checks', function ($request, $response, array $args) use 
             $content = $e->getResponse()->getBody()->getContents();
             $document = new Document($content);
 
-            $h1 = optional($document->first('h1'))->text();
-            $title = optional($document->first('title'))->text();
-            $description = optional($document->first('meta[name=description]'))->getAttribute('content');
-
-            $arrVars = [$id, $nowTime, $statusCode, $h1, $title, $description];
-
-            $stm = $this->get('pdo')->prepare("INSERT INTO
-                                url_checks (url_id, created_at, status_code, h1, title, description)
-                                VALUES (?, ?, ?, ?, ?, ?)");
-            $stm->execute($arrVars);
+            writeDataInDB($this->get('pdo'), $document, $id, $nowTime, $statusCode);
         }
 
         $this->get('flash')->addMessage('warning', 'Проверка была выполнена успешно, но сервер ответил с ошибкой');
@@ -217,16 +209,7 @@ $app->post('/urls/{id}/checks', function ($request, $response, array $args) use 
 
     $document = new Document($html, false);
 
-    $h1 = optional($document->first('h1'))->text();
-    $title = optional($document->first('title'))->text();
-    $description = optional($document->first('meta[name=description]'))->getAttribute('content');
-
-    $arrVars = [$id, $nowTime, $statusCode, $h1, $title, $description];
-
-    $stm = $this->get('pdo')->prepare("INSERT INTO
-                        url_checks (url_id, created_at, status_code, h1, title, description)
-                        VALUES (?, ?, ?, ?, ?, ?)");
-    $stm->execute($arrVars);
+    writeDataInDB($this->get('pdo'), $document, $id, $nowTime, $statusCode);
 
     $this->get('flash')->addMessage('success', 'Страница успешно проверена');
 

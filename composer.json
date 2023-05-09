@@ -30,6 +30,9 @@
     "autoload": {
         "psr-4": {
             "Analyzer\\": "src/"
-        }
+        },
+        "files": [
+            "src/WriteDataInDB.php"
+        ]
     }
 }
