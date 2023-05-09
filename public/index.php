@@ -2,7 +2,6 @@
 
 require __DIR__ . '/../vendor/autoload.php';
 
-use Analyzer\Connection;
 use Carbon\Carbon;
 use Slim\Factory\AppFactory;
 use DI\Container;
@@ -12,6 +11,7 @@ use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\ClientException;
 use DiDom\Document;
+use Dotenv;
 
 Valitron\Validator::lang('ru');
 
@@ -22,18 +22,37 @@ $container = new Container();
 
 session_start();
 
-$container->set('pdo', function () {
+$params = parse_url($_ENV['DATABASE_URL']);
 
-    $pdo = new Connection();
+$dbName = ltrim($params['path'], '/');
+$host = $params['host'];
+$port = $params['port'];
+$user = $params['user'];
+$pass = $params['pass'];
 
-    try {
-        $pdo = $pdo->connect();
-        // echo 'A connection to the PostgreSQL database sever has been established successfully.';
-    } catch (\PDOException $e) {
-        echo $e->getMessage();
-    }
-    return $pdo;
-});
+if ($host === "") {
+    throw new \Exception("Error reading environment variable DATABASE_URL");
+}
+
+// подключение к базе данных postgresql
+$conStr = sprintf(
+    "pgsql:host=%s;port=%d;dbname=%s;user=%s;password=%s",
+    $host,
+    $port,
+    $dbName,
+    $user,
+    $pass
+);
+
+try {
+    $pdo = new \PDO($conStr);
+    $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+    $pdo->setAttribute(\PDO::ATTR_DEFAULT_FETCH_MODE, \PDO::FETCH_ASSOC);
+} catch (\PDOException $e) {
+    echo $e->getMessage();
+}
+
+$container->set('pdo', $pdo);
 
 $container->set('renderer', function () {
     return new \Slim\Views\PhpRenderer(__DIR__ . '/../templates');
