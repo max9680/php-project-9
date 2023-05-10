@@ -1,0 +1,36 @@
+{% extends 'layouts.twig.html' %}
+
+{% block navitems %}
+<li class="nav-item">
+    <a class="nav-link" href="/">Главная</a>
+    </li>
+    <li class="nav-item">
+    <a class="nav-link active" href="/urls">Сайты</a>
+    </li>
+{% endblock %}
+
+{% block body %}
+<h1>Сайты</h1>
+<div class="table-responsive">
+<table class="table table-hover table-bordered" data-test="urls">
+    <tbody>
+        <tr>
+            <th>ID</th>
+            <th>Имя</th>
+            <th>Последняя проверка</th>
+            <th>Код ответа</th>
+        </tr>
+        {% for url in urls %}
+        <tr>
+            <td>
+                {{ url['id'] }}
+            </td>
+            <td><a href="urls/{{ url['id'] }}">{{ url['name'] }}</a></td>
+            <td>{{ url['lastcheck'] }}</td>
+            <td>{{ url['status_code'] }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+</div>
+{% endblock %}

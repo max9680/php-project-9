@@ -1,0 +1,35 @@
+{% extends 'layouts.twig.html' %}
+
+{% block navitems %}
+    <li class="nav-item">
+    <a class="nav-link active" href="/">Главная</a>
+    </li>
+    <li class="nav-item">
+    <a class="nav-link" href="/urls">Сайты</a>
+    </li>
+{% endblock %}
+
+{% block body %}
+<h1></h1>
+    <div class="row">
+        <div class="col-12 col-md-10 col-lg-8 mx-auto border rounded-3 bg-light p-5">
+            <h1 class="display-3">Анализатор страниц</h1>
+            <p class="lead">Бесплатно проверяйте сайты на SEO пригодность</p>
+    
+            <form action="/urls" method="post" class="row mb-3" required="">
+                <div class="col-8">
+                        {% if not error['URL'] %}
+                            <input type="text" name="url[name]" class="form-control form-control-lg" id="floatingInputValue" placeholder="https://www.example.com">
+                        {% endif %}
+                        {% if error['URL'] %}
+                            <input type="text" name="url[name]" value="{{ url['name'] }}" class="form-control form-control-lg is-invalid" id="floatingInputValue" placeholder="https://www.example.com">
+                            <div class="invalid-feedback">{{ error['URL'][0] }}</div>
+                        {% endif %}
+                </div>
+                <div class="col-2">
+                    <input type="submit" class="btn btn-primary btn-lg ms-3 px-5 text-uppercase mx-3" value="Проверить">
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock %}

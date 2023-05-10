@@ -4,6 +4,7 @@ require __DIR__ . '/../vendor/autoload.php';
 
 use Carbon\Carbon;
 use Slim\Factory\AppFactory;
+use Slim\Views\Twig;
 use DI\Container;
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7;
@@ -56,9 +57,10 @@ if (isset($pdo)) {
     $container->set('pdo', $pdo);
 }
 
-$container->set('renderer', function () {
-    return new \Slim\Views\PhpRenderer(__DIR__ . '/../templates');
+$container->set('view', function () {
+    return Twig::create(__DIR__ . '/../templates');
 });
+
 $container->set('flash', function () {
     return new \Slim\Flash\Messages();
 });
@@ -69,7 +71,7 @@ $app->addErrorMiddleware(true, true, true);
 
 $app->get('/', function ($request, $response) {
 
-    return $this->get('renderer')->render($response, 'index.phtml');
+    return $this->get('view')->render($response, 'index.twig.html');
 })->setName('index');
 
 
@@ -92,7 +94,7 @@ $app->get('/urls', function ($request, $response) {
         'urls' => $urlsWCheck
     ];
 
-    return $this->get('renderer')->render($response, 'urls/index.phtml', $params);
+    return $this->get('view')->render($response, 'urls/index.twig.html', $params);
 })->setName('urls.index');
 
 $app->get('/urls/{id}', function ($request, $response, array $args) {
@@ -116,7 +118,7 @@ $app->get('/urls/{id}', function ($request, $response, array $args) {
         'checks' => $checks
     ];
 
-    return $this->get('renderer')->render($response, 'urls/show.phtml', $params);
+    return $this->get('view')->render($response, 'urls/show.twig.html', $params);
 })->setName('urls.show');
 
 $router = $app->getRouteCollector()->getRouteParser();
@@ -136,7 +138,7 @@ $app->post('/urls', function ($request, $response) use ($router) {
             'url' => $url
         ];
 
-        return $this->get('renderer')->render($response->withStatus(422), 'index.phtml', $params);
+        return $this->get('view')->render($response->withStatus(422), 'index.twig.html', $params);
     }
 
     $parsedUrl = parse_url($url['name']);

@@ -22,7 +22,8 @@
         "imangazaliev/didom": "^2.0",
         "illuminate/support": "^8.83",
         "vlucas/phpdotenv": "^5.5",
-        "tightenco/collect": "^9.52"
+        "tightenco/collect": "^9.52",
+        "slim/twig-view": "^3.3"
     },
     "require-dev": {
         "squizlabs/php_codesniffer": "^3.7"
