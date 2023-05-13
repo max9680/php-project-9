@@ -23,7 +23,6 @@ $dotenv->safeload();
 
 $container = new Container();
 
-// $params = parse_url($_ENV['DATABASE_URL']);
 $databaseURL = Arr::get($_ENV, 'DATABASE_URL');
 
 if ($databaseURL === null) {
