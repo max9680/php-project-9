@@ -196,12 +196,12 @@ $app->post('/urls/{id}/checks', function ($request, $response, array $args) use 
             $content = $e->getResponse()->getBody()->getContents();
             $document = new Document($content);
         }
-        $requestException = true;
+        $reqException = true;
 
         $this->get('flash')->addMessage('warning', 'Проверка была выполнена успешно, но сервер ответил с ошибкой');
     }
 
-    if (!$requestException) {
+    if (!isset($reqException)) {
         $statusCode = $answer->getStatusCode();
         $html = $answer->getBody()->getContents();
         $document = new Document($html, false);
