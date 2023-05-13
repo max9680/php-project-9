@@ -50,9 +50,7 @@ $pdo = new \PDO($conStr);
 $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
 $pdo->setAttribute(\PDO::ATTR_DEFAULT_FETCH_MODE, \PDO::FETCH_ASSOC);
 
-if (isset($pdo)) {
-    $container->set('pdo', $pdo);
-}
+$container->set('pdo', $pdo);
 
 $container->set('view', function () {
     return Twig::create(__DIR__ . '/../templates');
