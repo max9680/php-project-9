@@ -12,6 +12,7 @@ use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\ClientException;
 use DiDom\Document;
+use Illuminate\Support\Arr;
 
 function writeDataInDB(\PDO $pdo, \DiDom\Document $document, int $id, \Carbon\Carbon $nowTime, int $statusCode)
 {
@@ -38,17 +39,20 @@ $dotenv->safeload();
 
 $container = new Container();
 
-$params = parse_url($_ENV['DATABASE_URL']);
+// $params = parse_url($_ENV['DATABASE_URL']);
+$databaseURL = Arr::get($_ENV, 'DATABASE_URL');
+
+if ($databaseURL === null) {
+    throw new \Exception("Error reading environment variable DATABASE_URL");
+}
+
+$params = parse_url($databaseURL);
 
 $dbName = ltrim($params['path'], '/');
 $host = $params['host'];
 $port = $params['port'];
 $user = $params['user'];
 $pass = $params['pass'];
-
-if ($host === "") {
-    throw new \Exception("Error reading environment variable DATABASE_URL");
-}
 
 // подключение к базе данных postgresql
 $conStr = sprintf(
