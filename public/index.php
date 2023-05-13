@@ -99,7 +99,7 @@ $app->get('/urls', function ($request, $response) {
     $urlsWCheck = array_map(function ($url) use ($collectionChecks) {
         $resultArray = $url;
         $check = $collectionChecks->firstWhere('url_id', $url['id']);
-        $resultArray['lastcheck'] = $check['created_at'] ?? null;
+        $resultArray['last_check_timestamp'] = $check['created_at'] ?? null;
         $resultArray['status_code'] = $check['status_code'] ?? null;
         return $resultArray;
     }, $urls);

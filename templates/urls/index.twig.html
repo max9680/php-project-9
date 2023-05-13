@@ -26,7 +26,7 @@
                 {{ url['id'] }}
             </td>
             <td><a href="urls/{{ url['id'] }}">{{ url['name'] }}</a></td>
-            <td>{{ url['lastcheck'] }}</td>
+            <td>{{ url['last_check_timestamp'] }}</td>
             <td>{{ url['status_code'] }}</td>
         </tr>
         {% endfor %}
