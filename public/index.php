@@ -12,22 +12,6 @@ use GuzzleHttp\Exception\ClientException;
 use DiDom\Document;
 use Illuminate\Support\Arr;
 
-function writeDataInDB(\PDO $pdo, \DiDom\Document $document, int $id, \Carbon\Carbon $nowTime, int $statusCode)
-{
-    $h1 = optional($document->first('h1'))->text();
-    $title = optional($document->first('title'))->text();
-    $description = optional($document->first('meta[name=description]'))->getAttribute('content');
-
-    $arrVars = [$id, $nowTime, $statusCode, $h1, $title, $description];
-
-    $stm = $pdo->prepare("INSERT INTO
-                        url_checks (url_id, created_at, status_code, h1, title, description)
-                        VALUES (?, ?, ?, ?, ?, ?)");
-    $stm->execute($arrVars);
-
-    return $pdo->lastInsertId();
-}
-
 require __DIR__ . '/../vendor/autoload.php';
 
 session_start();
@@ -201,6 +185,10 @@ $app->post('/urls/{id}/checks', function ($request, $response, array $args) use 
 
     try {
         $answer = $client->request('GET', $urlName[0]);
+    } catch (ConnectException $e) {
+        $this->get('flash')->addMessage('error', 'Произошла ошибка при проверке, не удалось подключиться');
+
+        return $response->withHeader('Location', $router->urlFor('urls.show', ['id' => $id]))->withStatus(301);
     } catch (RequestException $e) {
         $statusCode = null;
 
@@ -208,26 +196,30 @@ $app->post('/urls/{id}/checks', function ($request, $response, array $args) use 
             $statusCode = $e->getResponse()->getStatusCode();
             $content = $e->getResponse()->getBody()->getContents();
             $document = new Document($content);
-
-            writeDataInDB($this->get('pdo'), $document, $id, $nowTime, $statusCode);
         }
+        $requestException = true;
 
         $this->get('flash')->addMessage('warning', 'Проверка была выполнена успешно, но сервер ответил с ошибкой');
-        return $response->withHeader('Location', $router->urlFor('urls.show', ['id' => $id]))->withStatus(301);
-    } catch (ConnectException $e) {
-        $this->get('flash')->addMessage('error', 'Произошла ошибка при проверке, не удалось подключиться');
-
-        return $response->withHeader('Location', $router->urlFor('urls.show', ['id' => $id]))->withStatus(301);
     }
 
-    $statusCode = $answer->getStatusCode();
-    $html = $answer->getBody()->getContents();
+    if (!$requestException) {
+        $statusCode = $answer->getStatusCode();
+        $html = $answer->getBody()->getContents();
+        $document = new Document($html, false);
 
-    $document = new Document($html, false);
+        $this->get('flash')->addMessage('success', 'Страница успешно проверена');
+    }
 
-    writeDataInDB($this->get('pdo'), $document, $id, $nowTime, $statusCode);
+    $h1 = optional($document->first('h1'))->text();
+    $title = optional($document->first('title'))->text();
+    $description = optional($document->first('meta[name=description]'))->getAttribute('content');
 
-    $this->get('flash')->addMessage('success', 'Страница успешно проверена');
+    $arrVars = [$id, $nowTime, $statusCode, $h1, $title, $description];
+
+    $stm = $this->get('pdo')->prepare("INSERT INTO
+                        url_checks (url_id, created_at, status_code, h1, title, description)
+                        VALUES (?, ?, ?, ?, ?, ?)");
+    $stm->execute($arrVars);
 
     return $response->withHeader('Location', $router->urlFor('urls.show', ['id' => $id]))->withStatus(301);
 })->setName('checks.store');
