@@ -1,7 +1,5 @@
 <?php
 
-require __DIR__ . '/../vendor/autoload.php';
-
 use Carbon\Carbon;
 use Slim\Factory\AppFactory;
 use Slim\Views\Twig;
@@ -30,6 +28,8 @@ function writeDataInDB(\PDO $pdo, \DiDom\Document $document, int $id, \Carbon\Ca
     return $pdo->lastInsertId();
 }
 
+require __DIR__ . '/../vendor/autoload.php';
+
 session_start();
 
 Valitron\Validator::lang('ru');
@@ -54,7 +54,6 @@ $port = $params['port'];
 $user = $params['user'];
 $pass = $params['pass'];
 
-// подключение к базе данных postgresql
 $conStr = sprintf(
     "pgsql:host=%s;port=%d;dbname=%s;user=%s;password=%s",
     $host,
@@ -64,13 +63,9 @@ $conStr = sprintf(
     $pass
 );
 
-try {
-    $pdo = new \PDO($conStr);
-    $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
-    $pdo->setAttribute(\PDO::ATTR_DEFAULT_FETCH_MODE, \PDO::FETCH_ASSOC);
-} catch (\PDOException $e) {
-    echo $e->getMessage();
-}
+$pdo = new \PDO($conStr);
+$pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+$pdo->setAttribute(\PDO::ATTR_DEFAULT_FETCH_MODE, \PDO::FETCH_ASSOC);
 
 if (isset($pdo)) {
     $container->set('pdo', $pdo);
