@@ -2,10 +2,10 @@
 
 {% block navitems %}
 <li class="nav-item">
-    <a class="nav-link" href="/">Главная</a>
+    <a class="nav-link" href="{{ url_for('index') }}">Главная</a>
     </li>
     <li class="nav-item">
-    <a class="nav-link active" href="/urls">Сайты</a>
+    <a class="nav-link active" href="{{ url_for('urls.index') }}">Сайты</a>
     </li>
 {% endblock %}
 
@@ -25,7 +25,7 @@
             <td>
                 {{ url['id'] }}
             </td>
-            <td><a href="urls/{{ url['id'] }}">{{ url['name'] }}</a></td>
+            <td><a href="{{ url_for('urls.show', {'id' : url['id']}) }}">{{ url['name'] }}</a></td>
             <td>{{ url['last_check_timestamp'] }}</td>
             <td>{{ url['status_code'] }}</td>
         </tr>

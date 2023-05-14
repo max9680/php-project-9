@@ -2,10 +2,10 @@
 
 {% block navitems %}
     <li class="nav-item">
-    <a class="nav-link active" href="/">Главная</a>
+    <a class="nav-link active" href="{{ url_for('index') }}">Главная</a>
     </li>
     <li class="nav-item">
-    <a class="nav-link" href="/urls">Сайты</a>
+    <a class="nav-link" href="{{ url_for('urls.index') }}">Сайты</a>
     </li>
 {% endblock %}
 
@@ -16,7 +16,7 @@
             <h1 class="display-3">Анализатор страниц</h1>
             <p class="lead">Бесплатно проверяйте сайты на SEO пригодность</p>
     
-            <form action="/urls" method="post" class="row mb-3" required="">
+            <form action="{{ url_for('urls.index') }}" method="post" class="row mb-3" required="">
                 <div class="col-8">
                         {% if not error['URL'] %}
                             <input type="text" name="url[name]" class="form-control form-control-lg" id="floatingInputValue" placeholder="https://www.example.com">

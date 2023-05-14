@@ -3,6 +3,7 @@
 use Carbon\Carbon;
 use Slim\Factory\AppFactory;
 use Slim\Views\Twig;
+use Slim\Views\TwigMiddleware;
 use DI\Container;
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7;
@@ -52,9 +53,9 @@ $pdo->setAttribute(\PDO::ATTR_DEFAULT_FETCH_MODE, \PDO::FETCH_ASSOC);
 
 $container->set('pdo', $pdo);
 
-$container->set('view', function () {
-    return Twig::create(__DIR__ . '/../templates');
-});
+// $container->set('view', function () {
+//     return Twig::create(__DIR__ . '/../templates');
+// });
 
 $container->set('flash', function () {
     return new \Slim\Flash\Messages();
@@ -62,15 +63,20 @@ $container->set('flash', function () {
 
 $app = AppFactory::createFromContainer($container);
 
+$twig = Twig::create(__DIR__ . '/../templates', ['cache' => false]);
+
 $app->addErrorMiddleware(true, true, true);
+$app->add(TwigMiddleware::create($app, $twig));
 
 $app->get('/', function ($request, $response) {
+    $view = Twig::fromRequest($request);
 
-    return $this->get('view')->render($response, 'index.twig.html');
+    return $view->render($response, 'index.twig.html');
 })->setName('index');
 
 
 $app->get('/urls', function ($request, $response) {
+    $view = Twig::fromRequest($request);
 
     $urls = $this->get('pdo')->query("SELECT * FROM urls ORDER BY id DESC")->fetchAll();
 
@@ -89,10 +95,12 @@ $app->get('/urls', function ($request, $response) {
         'urls' => $urlsWCheck
     ];
 
-    return $this->get('view')->render($response, 'urls/index.twig.html', $params);
+    return $view->render($response, 'urls/index.twig.html', $params);
 })->setName('urls.index');
 
 $app->get('/urls/{id}', function ($request, $response, array $args) {
+    $view = Twig::fromRequest($request);
+    
     $messages = $this->get('flash')->getMessages();
 
     $id = $args['id'];
@@ -113,12 +121,14 @@ $app->get('/urls/{id}', function ($request, $response, array $args) {
         'checks' => $checks
     ];
 
-    return $this->get('view')->render($response, 'urls/show.twig.html', $params);
+    return $view->render($response, 'urls/show.twig.html', $params);
 })->setName('urls.show');
 
 $router = $app->getRouteCollector()->getRouteParser();
 
 $app->post('/urls', function ($request, $response) use ($router) {
+    $view = Twig::fromRequest($request);
+
     $url = $request->getParsedBodyParam('url');
 
     $v = new Valitron\Validator(['URL' => $url['name']]);
@@ -132,7 +142,7 @@ $app->post('/urls', function ($request, $response) use ($router) {
             'url' => $url
         ];
 
-        return $this->get('view')->render($response->withStatus(422), 'index.twig.html', $params);
+        return $view->render($response->withStatus(422), 'index.twig.html', $params);
     }
 
     $url['name'] = strtolower($url['name']);
@@ -166,6 +176,8 @@ $app->post('/urls', function ($request, $response) use ($router) {
 })->setName('urls.store');
 
 $app->post('/urls/{id}/checks', function ($request, $response, array $args) use ($router) {
+    $view = Twig::fromRequest($request);
+    
     $id = $args['id'];
 
     $sql = "SELECT name FROM urls WHERE id = ?";
