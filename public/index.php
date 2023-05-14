@@ -120,7 +120,6 @@ $router = $app->getRouteCollector()->getRouteParser();
 
 $app->post('/urls', function ($request, $response) use ($router) {
     $url = $request->getParsedBodyParam('url');
-    $url['name'] = strtolower($url['name']);
 
     $v = new Valitron\Validator(['URL' => $url['name']]);
 
@@ -136,6 +135,7 @@ $app->post('/urls', function ($request, $response) use ($router) {
         return $this->get('view')->render($response->withStatus(422), 'index.twig.html', $params);
     }
 
+    $url['name'] = strtolower($url['name']);
     $parsedUrl = parse_url($url['name']);
     $urlForInput = $parsedUrl['scheme'] . '://' . $parsedUrl['host'];
 
