@@ -200,7 +200,7 @@ $app->post('/urls/{id}/checks', function ($request, $response, array $args) use 
     }
 
     $statusCode = $answer ? $answer->getStatusCode() : null;
-    $html = $answer->getBody()->getContents();
+    $html = $answer ? $answer->getBody()->getContents() : null;
     $document = new Document($html, false);
 
     $h1 = optional($document->first('h1'))->text();
