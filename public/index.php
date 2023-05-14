@@ -199,7 +199,7 @@ $app->post('/urls/{id}/checks', function ($request, $response, array $args) use 
         $this->get('flash')->addMessage('success', 'Страница успешно проверена');
     }
 
-    $statusCode = $answer->getStatusCode();
+    $statusCode = optional($answer->getStatusCode());
     $html = $answer->getBody()->getContents();
     $document = new Document($html, false);
 
