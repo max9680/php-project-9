@@ -187,7 +187,6 @@ $app->post('/urls/{id}/checks', function ($request, $response, array $args) use 
 
         return $response->withHeader('Location', $router->urlFor('urls.show', ['id' => $id]))->withStatus(301);
     } catch (RequestException $e) {
-        $answer = $e->getResponse();
         $reqException = true;
 
         $this->get('flash')->addMessage('warning', 'Проверка была выполнена успешно, но сервер ответил с ошибкой');
@@ -195,6 +194,9 @@ $app->post('/urls/{id}/checks', function ($request, $response, array $args) use 
 
     if (!isset($reqException)) {
         $this->get('flash')->addMessage('success', 'Страница успешно проверена');
+        $answer = $client->request('GET', $urlName[0]);
+    } else {
+        $answer = $e->getResponse();
     }
 
     $statusCode = $answer->getStatusCode();
