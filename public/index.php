@@ -78,11 +78,11 @@ $app->get('/urls', function ($request, $response) {
     $collectionChecks = collect($checks);
 
     $urlsWCheck = array_map(function ($url) use ($collectionChecks) {
-        $resultArray = $url;
+        $result = $url;
         $check = $collectionChecks->firstWhere('url_id', $url['id']);
-        $resultArray['last_check_timestamp'] = $check['created_at'] ?? null;
-        $resultArray['status_code'] = $check['status_code'] ?? null;
-        return $resultArray;
+        $result['last_check_timestamp'] = $check['created_at'] ?? null;
+        $result['status_code'] = $check['status_code'] ?? null;
+        return $result;
     }, $urls);
 
     $params = [
@@ -189,8 +189,6 @@ $app->post('/urls/{id}/checks', function ($request, $response, array $args) use 
     } catch (RequestException $e) {
         $answer = $e->getResponse();
         $reqException = true;
-        // var_dump($client->request('GET', $urlName[0]));
-        // die();
 
         $this->get('flash')->addMessage('warning', 'Проверка была выполнена успешно, но сервер ответил с ошибкой');
     }
