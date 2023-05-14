@@ -144,7 +144,7 @@ $app->post('/urls', function ($request, $response) use ($router) {
     $stm->execute([$urlForInput]);
     $urlInDB = $stm->fetch(\PDO::FETCH_COLUMN);
 
-    if (isset($urlInDB) && ($urlInDB !== false)) {
+    if (($urlInDB !== false) && ($urlInDB !== null)) {
         $this->get('flash')->addMessage('success', 'Страница уже существует');
 
         $id = $urlInDB;
@@ -153,11 +153,10 @@ $app->post('/urls', function ($request, $response) use ($router) {
     }
 
     $nowTime = Carbon::now();
-    $arrVars = [$urlForInput, $nowTime];
 
     $sql = "INSERT INTO urls (name, created_at) VALUES (?,?)";
     $stm = $this->get('pdo')->prepare($sql);
-    $stm->execute($arrVars);
+    $stm->execute([$urlForInput, $nowTime]);
 
     $id = $this->get('pdo')->lastInsertId();
 
