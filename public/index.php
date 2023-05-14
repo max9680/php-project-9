@@ -100,7 +100,7 @@ $app->get('/urls', function ($request, $response) {
 
 $app->get('/urls/{id}', function ($request, $response, array $args) {
     $view = Twig::fromRequest($request);
-    
+
     $messages = $this->get('flash')->getMessages();
 
     $id = $args['id'];
@@ -177,7 +177,7 @@ $app->post('/urls', function ($request, $response) use ($router) {
 
 $app->post('/urls/{id}/checks', function ($request, $response, array $args) use ($router) {
     $view = Twig::fromRequest($request);
-    
+
     $id = $args['id'];
 
     $sql = "SELECT name FROM urls WHERE id = ?";
