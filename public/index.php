@@ -179,7 +179,7 @@ $app->post('/urls/{id}/checks', function ($request, $response, array $args) use 
     ]);
 
     $nowTime = Carbon::now();
-    $answer = null;
+ 
 
     try {
         $answer = $client->request('GET', $urlName[0]);
@@ -188,25 +188,19 @@ $app->post('/urls/{id}/checks', function ($request, $response, array $args) use 
 
         return $response->withHeader('Location', $router->urlFor('urls.show', ['id' => $id]))->withStatus(301);
     } catch (RequestException $e) {
-        $statusCode = null;
-
-        if ($e->getResponse() !== null) {
-            $statusCode = $e->getResponse()->getStatusCode();
-            $content = $e->getResponse()->getBody()->getContents();
-            $document = new Document($content);
-        }
+        $answer = $e->getResponse();
         $reqException = true;
 
         $this->get('flash')->addMessage('warning', 'Проверка была выполнена успешно, но сервер ответил с ошибкой');
     }
 
     if (!isset($reqException)) {
-        $statusCode = $answer->getStatusCode();
-        $html = $answer->getBody()->getContents();
-        $document = new Document($html, false);
-
         $this->get('flash')->addMessage('success', 'Страница успешно проверена');
     }
+
+    $statusCode = $answer->getStatusCode();
+    $html = $answer->getBody()->getContents();
+    $document = new Document($html, false);
 
     $h1 = optional($document->first('h1'))->text();
     $title = optional($document->first('title'))->text();
