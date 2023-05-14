@@ -179,7 +179,6 @@ $app->post('/urls/{id}/checks', function ($request, $response, array $args) use 
     ]);
 
     $nowTime = Carbon::now();
- 
 
     try {
         $answer = $client->request('GET', $urlName[0]);
