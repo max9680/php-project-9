@@ -191,19 +191,15 @@ $app->post('/urls/{id}/checks', function ($request, $response, array $args) use 
 
     try {
         $answer = $client->request('GET', $urlName[0]);
+        $this->get('flash')->addMessage('success', 'Страница успешно проверена');
     } catch (ConnectException $e) {
         $this->get('flash')->addMessage('error', 'Произошла ошибка при проверке, не удалось подключиться');
 
         return $response->withHeader('Location', $router->urlFor('urls.show', ['id' => $id]))->withStatus(301);
     } catch (RequestException $e) {
         $answer = $e->getResponse();
-        $reqException = true;
 
         $this->get('flash')->addMessage('warning', 'Проверка была выполнена успешно, но сервер ответил с ошибкой');
-    }
-
-    if (!isset($reqException)) {
-        $this->get('flash')->addMessage('success', 'Страница успешно проверена');
     }
 
     $statusCode = $answer ? $answer->getStatusCode() : null;
