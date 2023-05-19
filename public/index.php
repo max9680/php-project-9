@@ -203,7 +203,7 @@ $app->post('/urls/{id}/checks', function ($request, $response, array $args) use 
     }
 
     // $statusCode = $answer ? $answer->getStatusCode() : null;
-    $statusCode = $answer->getStatusCode();
+    $statusCode = optional($answer->getStatusCode());
     $html = $answer ? $answer->getBody()->getContents() : null;
     $document = new Document($html, false);
 
