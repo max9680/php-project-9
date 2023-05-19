@@ -210,12 +210,10 @@ $app->post('/urls/{id}/checks', function ($request, $response, array $args) use 
     $title = optional($document->first('title'))->text();
     $description = optional($document->first('meta[name=description]'))->getAttribute('content');
 
-    $arrVars = [$id, $nowTime, $statusCode, $h1, $title, $description];
-
     $stm = $this->get('pdo')->prepare("INSERT INTO
                         url_checks (url_id, created_at, status_code, h1, title, description)
                         VALUES (?, ?, ?, ?, ?, ?)");
-    $stm->execute($arrVars);
+    $stm->execute([$id, $nowTime, $statusCode, $h1, $title, $description]);
 
     return $response->withHeader('Location', $router->urlFor('urls.show', ['id' => $id]))->withStatus(301);
 })->setName('checks.store');
