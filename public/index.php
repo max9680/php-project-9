@@ -202,8 +202,7 @@ $app->post('/urls/{id}/checks', function ($request, $response, array $args) use 
         $this->get('flash')->addMessage('warning', 'Проверка была выполнена успешно, но сервер ответил с ошибкой');
     }
 
-    // $statusCode = $answer ? $answer->getStatusCode() : null;
-    $statusCode = optional($answer->getStatusCode());
+    $statusCode = $answer ? $answer->getStatusCode() : null;
     $html = $answer ? $answer->getBody()->getContents() : null;
     $document = new Document($html, false);
 
