@@ -157,9 +157,7 @@ $app->post('/urls', function ($request, $response) use ($router) {
     if ($urlInDB) {
         $this->get('flash')->addMessage('success', 'Страница уже существует');
 
-        $id = $urlInDB;
-
-        return $response->withHeader('Location', $router->urlFor('urls.show', ['id' => $id]))->withStatus(301);
+        return $response->withHeader('Location', $router->urlFor('urls.show', ['id' => $urlInDB]))->withStatus(301);
     }
 
     $nowTime = Carbon::now();
