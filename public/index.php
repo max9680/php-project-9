@@ -53,10 +53,6 @@ $pdo->setAttribute(\PDO::ATTR_DEFAULT_FETCH_MODE, \PDO::FETCH_ASSOC);
 
 $container->set('pdo', $pdo);
 
-// $container->set('view', function () {
-//     return Twig::create(__DIR__ . '/../templates');
-// });
-
 $container->set('flash', function () {
     return new \Slim\Flash\Messages();
 });
