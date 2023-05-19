@@ -14,7 +14,7 @@
                         {% endif %}
                         {% if error['URL'] %}
                             <input type="text" name="url[name]" value="{{ url['name'] }}" class="form-control form-control-lg is-invalid" id="floatingInputValue" placeholder="https://www.example.com">
-                            <div class="invalid-feedback">{{ error['URL'][0] }}</div>
+                            <div class="invalid-feedback">{{ error['URL']|first }}</div>
                         {% endif %}
                 </div>
                 <div class="col-2">
