@@ -154,7 +154,7 @@ $app->post('/urls', function ($request, $response) use ($router) {
     $stm->execute([$urlForInput]);
     $urlInDB = $stm->fetch(\PDO::FETCH_COLUMN);
 
-    if (($urlInDB !== false) && ($urlInDB !== null)) {
+    if ($urlInDB) {
         $this->get('flash')->addMessage('success', 'Страница уже существует');
 
         $id = $urlInDB;
