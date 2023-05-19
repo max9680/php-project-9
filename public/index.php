@@ -134,7 +134,8 @@ $app->post('/urls', function ($request, $response) use ($router) {
             'url' => $url
         ];
 
-        return $this->get('view')->fromRequest($request)->render($response->withStatus(422), 'index.twig.html', $params);
+        return $this->get('view')->fromRequest($request)
+            ->render($response->withStatus(422), 'index.twig.html', $params);
     }
 
     $url['name'] = strtolower($url['name']);
