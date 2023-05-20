@@ -24,7 +24,7 @@ $dotenv->safeload();
 
 $container = new Container();
 
-$databaseURL = Arr::get($_ENV, 'DATABASE_URL');
+$databaseURL = Arr::get($_ENV, 'DATABASE_URL', null);
 
 if ($databaseURL === null) {
     throw new \Exception("Error reading environment variable DATABASE_URL");
