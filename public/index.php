@@ -64,16 +64,15 @@ $container->set('view', function () {
     return Twig::create(__DIR__ . '/../templates', ['cache' => false]);
 });
 
-$app = AppFactory::createFromContainer($container);
-
-$twig = Twig::create(__DIR__ . '/../templates', ['cache' => false]);
+$app = AppFactory::create();
 
 $app->addErrorMiddleware(true, true, true);
-$app->add(TwigMiddleware::create($app, $twig));
-// $app->add(TwigMiddleware::createFromContainer($app));
+
+$app->add(TwigMiddleware::createFromContainer($app));
 
 $app->get('/', function ($request, $response) {
-    return $this->get('view')->fromRequest($request)->render($response, 'index.twig.html');
+
+    return $this->get('view')->render($response, 'index.twig.html');
 })->setName('index');
 
 
@@ -97,7 +96,7 @@ $app->get('/urls', function ($request, $response) {
         'urls' => $urlsWCheck
     ];
 
-    return $this->get('view')->fromRequest($request)->render($response, 'urls/index.twig.html', $params);
+    return $this->get('view')->render($response, 'urls/index.twig.html', $params);
 })->setName('urls.index');
 
 $app->get('/urls/{id}', function ($request, $response, array $args) {
@@ -121,7 +120,7 @@ $app->get('/urls/{id}', function ($request, $response, array $args) {
         'checks' => $checks
     ];
 
-    return $this->get('view')->fromRequest($request)->render($response, 'urls/show.twig.html', $params);
+    return $this->get('view')->render($response, 'urls/show.twig.html', $params);
 })->setName('urls.show');
 
 $router = $app->getRouteCollector()->getRouteParser();
@@ -140,7 +139,7 @@ $app->post('/urls', function ($request, $response) use ($router) {
             'url' => $url
         ];
 
-        return $this->get('view')->fromRequest($request)
+        return $this->get('view')
             ->render($response->withStatus(422), 'index.twig.html', $params);
     }
 
