@@ -30,19 +30,19 @@
 
     {% if flash['success'] %}
         <div class="alert alert-success" role="alert">
-        {{ flash['success'][0] }}
+        {{ flash['success']|join }}
         </div>
     {% endif %}
 
     {% if flash['warning'] %}
         <div class="alert alert-warning" role="alert">
-        {{ flash['warning'][0] }}
+        {{ flash['warning']|join }}
         </div>
     {% endif %}
 
     {% if flash['error'] %}
         <div class="alert alert-danger" role="alert">
-        {{ flash['error'][0] }}
+        {{ flash['error']|join }}
         </div>
     {% endif %}
 
