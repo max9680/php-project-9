@@ -23,6 +23,7 @@ $dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/../');
 $dotenv->safeload();
 
 $container = new Container();
+AppFactory::setContainer($container);
 
 $container->set('pdo', function () {
     $databaseURL = Arr::get($_ENV, 'DATABASE_URL', null);
@@ -69,6 +70,7 @@ $twig = Twig::create(__DIR__ . '/../templates', ['cache' => false]);
 
 $app->addErrorMiddleware(true, true, true);
 $app->add(TwigMiddleware::create($app, $twig));
+// $app->add(TwigMiddleware::createFromContainer($app));
 
 $app->get('/', function ($request, $response) {
     return $this->get('view')->fromRequest($request)->render($response, 'index.twig.html');
@@ -77,17 +79,19 @@ $app->get('/', function ($request, $response) {
 
 $app->get('/urls', function ($request, $response) {
     $urls = $this->get('pdo')->query("SELECT * FROM urls ORDER BY id DESC")->fetchAll();
+    $collectionUrls = collect($urls);
 
     $checks = $this->get('pdo')->query("SELECT * FROM url_checks ORDER BY id DESC")->fetchAll();
     $collectionChecks = collect($checks);
 
-    $urlsWCheck = array_map(function ($url) use ($collectionChecks) {
-        $result = $url;
-        $check = $collectionChecks->firstWhere('url_id', $url['id']);
-        $result['last_check_timestamp'] = $check['created_at'] ?? null;
-        $result['status_code'] = $check['status_code'] ?? null;
+    $urlsWCheck = $collectionUrls->map(function ($item) use ($collectionChecks){
+        $result = $item;
+        $check = $collectionChecks->firstWhere('url_id', $item['id']);
+        $result['last_check_timestamp'] = Arr::get($check, 'created_at', null);
+        $result['status_code'] = Arr::get($check, 'status_code', null);
+        
         return $result;
-    }, $urls);
+    });
 
     $params = [
         'urls' => $urlsWCheck
