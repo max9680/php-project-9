@@ -24,34 +24,36 @@ $dotenv->safeload();
 
 $container = new Container();
 
-$databaseURL = Arr::get($_ENV, 'DATABASE_URL', null);
+$container->set('pdo', function () {
+    $databaseURL = Arr::get($_ENV, 'DATABASE_URL', null);
 
-if ($databaseURL === null) {
-    throw new \Exception("Error reading environment variable DATABASE_URL");
-}
+    if ($databaseURL === null) {
+        throw new \Exception("Error reading environment variable DATABASE_URL");
+    }
 
-$params = parse_url($databaseURL);
+    $params = parse_url($databaseURL);
 
-$dbName = ltrim($params['path'], '/');
-$host = Arr::get($params, 'host', null);
-$port = Arr::get($params, 'port', null);
-$user = Arr::get($params, 'user', null);
-$pass = Arr::get($params, 'pass', null);
+    $dbName = ltrim($params['path'], '/');
+    $host = Arr::get($params, 'host', null);
+    $port = Arr::get($params, 'port', null);
+    $user = Arr::get($params, 'user', null);
+    $pass = Arr::get($params, 'pass', null);
 
-$conStr = sprintf(
-    "pgsql:host=%s;port=%d;dbname=%s;user=%s;password=%s",
-    $host,
-    $port,
-    $dbName,
-    $user,
-    $pass
-);
+    $conStr = sprintf(
+        "pgsql:host=%s;port=%d;dbname=%s;user=%s;password=%s",
+        $host,
+        $port,
+        $dbName,
+        $user,
+        $pass
+    );
 
-$pdo = new \PDO($conStr);
-$pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
-$pdo->setAttribute(\PDO::ATTR_DEFAULT_FETCH_MODE, \PDO::FETCH_ASSOC);
+    $pdo = new \PDO($conStr);
+    $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+    $pdo->setAttribute(\PDO::ATTR_DEFAULT_FETCH_MODE, \PDO::FETCH_ASSOC);
 
-$container->set('pdo', $pdo);
+    return $pdo;
+});
 
 $container->set('flash', function () {
     return new \Slim\Flash\Messages();
