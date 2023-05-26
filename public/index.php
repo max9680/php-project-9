@@ -33,10 +33,10 @@ if ($databaseURL === null) {
 $params = parse_url($databaseURL);
 
 $dbName = ltrim($params['path'], '/');
-$host = $params['host'];
-$port = $params['port'];
-$user = $params['user'];
-$pass = $params['pass'];
+$host = Arr::get($params, 'host', null);
+$port = Arr::get($params, 'port', null);
+$user = Arr::get($params, 'user', null);
+$pass = Arr::get($params, 'pass', null);
 
 $conStr = sprintf(
     "pgsql:host=%s;port=%d;dbname=%s;user=%s;password=%s",
