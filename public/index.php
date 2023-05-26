@@ -84,12 +84,12 @@ $app->get('/urls', function ($request, $response) {
     $checks = $this->get('pdo')->query("SELECT * FROM url_checks ORDER BY id DESC")->fetchAll();
     $collectionChecks = collect($checks);
 
-    $urlsWCheck = $collectionUrls->map(function ($item) use ($collectionChecks){
+    $urlsWCheck = $collectionUrls->map(function ($item) use ($collectionChecks) {
         $result = $item;
         $check = $collectionChecks->firstWhere('url_id', $item['id']);
         $result['last_check_timestamp'] = Arr::get($check, 'created_at', null);
         $result['status_code'] = Arr::get($check, 'status_code', null);
-        
+
         return $result;
     });
 
