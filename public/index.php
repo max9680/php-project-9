@@ -84,12 +84,12 @@ $app->get('/urls', function ($request, $response) {
     $collectionChecks = collect($checks);
 
     $urlsWCheck = $collectionUrls->map(function ($item) use ($collectionChecks) {
-        $result = $item;
+        // $result = $item;
         $check = $collectionChecks->firstWhere('url_id', $item['id']);
-        $result['last_check_timestamp'] = Arr::get($check, 'created_at', null);
-        $result['status_code'] = Arr::get($check, 'status_code', null);
+        $item['last_check_timestamp'] = Arr::get($check, 'created_at', null);
+        $item['status_code'] = Arr::get($check, 'status_code', null);
 
-        return $result;
+        return $item;
     });
 
     $params = [
