@@ -70,6 +70,8 @@ $app->addErrorMiddleware(true, true, true);
 
 $app->add(TwigMiddleware::createFromContainer($app));
 
+$container->get('view')->getEnvironment()->addGlobal('flash', $container->get('flash')->getMessages());
+
 $app->get('/', function ($request, $response) {
 
     return $this->get('view')->render($response, 'index.twig.html');
@@ -84,7 +86,6 @@ $app->get('/urls', function ($request, $response) {
     $collectionChecks = collect($checks);
 
     $urlsWCheck = $collectionUrls->map(function ($item) use ($collectionChecks) {
-        // $result = $item;
         $check = $collectionChecks->firstWhere('url_id', $item['id']);
         $item['last_check_timestamp'] = Arr::get($check, 'created_at', null);
         $item['status_code'] = Arr::get($check, 'status_code', null);
@@ -100,8 +101,6 @@ $app->get('/urls', function ($request, $response) {
 })->setName('urls.index');
 
 $app->get('/urls/{id}', function ($request, $response, array $args) {
-    $messages = $this->get('flash')->getMessages();
-
     $id = $args['id'];
 
     $sql = "SELECT * FROM urls WHERE id = ?";
@@ -116,7 +115,6 @@ $app->get('/urls/{id}', function ($request, $response, array $args) {
 
     $params = [
         'url' => $url,
-        'flash' => $messages,
         'checks' => $checks
     ];
 
