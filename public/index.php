@@ -183,7 +183,7 @@ $app->post('/urls/{id}/checks', function ($request, $response, array $args) use 
     $sql = "SELECT name FROM urls WHERE id = ?";
     $stm = $this->get('pdo')->prepare($sql);
     $stm->execute([$id]);
-    $urlName = $stm->fetchAll(\PDO::FETCH_COLUMN);
+    $urlName = $stm->fetch();
 
     $client = new Client([
         'timeout'  => 3.0,
@@ -192,7 +192,7 @@ $app->post('/urls/{id}/checks', function ($request, $response, array $args) use 
     $nowTime = Carbon::now();
 
     try {
-        $answer = $client->request('GET', $urlName[0]);
+        $answer = $client->request('GET', $urlName['name']);
         $this->get('flash')->addMessage('success', 'Страница успешно проверена');
     } catch (ConnectException $e) {
         $this->get('flash')->addMessage('error', 'Произошла ошибка при проверке, не удалось подключиться');
