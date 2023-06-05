@@ -101,12 +101,20 @@ $app->get('/urls', function ($request, $response) {
 })->setName('urls.index');
 
 $app->get('/urls/{id}', function ($request, $response, array $args) {
-    $id = $args['id'];
+    if (is_numeric($args['id'])) {
+        $id = $args['id'];
+    } else {
+        return $this->get('view')->render($response, 'notfound.twig.html')->withStatus(404);
+    }
 
     $sql = "SELECT * FROM urls WHERE id = ?";
     $stm = $this->get('pdo')->prepare($sql);
     $stm->execute([$id]);
     $url = $stm->fetch();
+
+    if ($url === false) {
+        return $this->get('view')->render($response, 'notfound.twig.html')->withStatus(404);
+    }
 
     $sql = "SELECT * FROM url_checks WHERE url_id = ? ORDER BY id DESC";
     $stm = $this->get('pdo')->prepare($sql);
