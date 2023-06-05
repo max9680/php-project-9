@@ -161,7 +161,7 @@ $app->post('/urls', function ($request, $response) use ($router) {
     if ($urlInDB) {
         $this->get('flash')->addMessage('success', 'Страница уже существует');
 
-        return $response->withHeader('Location', $router->urlFor('urls.show', ['id' => $urlInDB]))->withStatus(301);
+        return $response->withRedirect($router->urlFor('urls.show', ['id' => $urlInDB]), 301);
     }
 
     $nowTime = Carbon::now();
@@ -174,7 +174,7 @@ $app->post('/urls', function ($request, $response) use ($router) {
 
     $this->get('flash')->addMessage('success', 'Страница успешно добавлена');
 
-    return $response->withHeader('Location', $router->urlFor('urls.show', ['id' => $id]))->withStatus(301);
+    return $response->withRedirect($router->urlFor('urls.show', ['id' => $id]), 301);
 })->setName('urls.store');
 
 $app->post('/urls/{id}/checks', function ($request, $response, array $args) use ($router) {
@@ -197,7 +197,7 @@ $app->post('/urls/{id}/checks', function ($request, $response, array $args) use 
     } catch (ConnectException $e) {
         $this->get('flash')->addMessage('error', 'Произошла ошибка при проверке, не удалось подключиться');
 
-        return $response->withHeader('Location', $router->urlFor('urls.show', ['id' => $id]))->withStatus(301);
+        return $response->withRedirect($router->urlFor('urls.show', ['id' => $id]), 301);
     } catch (RequestException $e) {
         $answer = $e->getResponse();
 
@@ -217,7 +217,7 @@ $app->post('/urls/{id}/checks', function ($request, $response, array $args) use 
                         VALUES (?, ?, ?, ?, ?, ?)");
     $stm->execute([$id, $nowTime, $statusCode, $h1, $title, $description]);
 
-    return $response->withHeader('Location', $router->urlFor('urls.show', ['id' => $id]))->withStatus(301);
+    return $response->withRedirect($router->urlFor('urls.show', ['id' => $id]), 301);
 })->setName('checks.store');
 
 $app->run();
