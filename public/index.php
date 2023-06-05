@@ -192,7 +192,7 @@ $app->post('/urls/{id}/checks', function ($request, $response, array $args) use 
     $nowTime = Carbon::now();
 
     try {
-        $answer = $client->request('GET', $urlName['name']);
+        $answer = $client->get($urlName['name']);
         $this->get('flash')->addMessage('success', 'Страница успешно проверена');
     } catch (ConnectException $e) {
         $this->get('flash')->addMessage('error', 'Произошла ошибка при проверке, не удалось подключиться');
@@ -204,8 +204,8 @@ $app->post('/urls/{id}/checks', function ($request, $response, array $args) use 
         $this->get('flash')->addMessage('warning', 'Проверка была выполнена успешно, но сервер ответил с ошибкой');
     }
 
-    $statusCode = $answer ? $answer->getStatusCode() : null;
-    $html = $answer ? $answer->getBody()->getContents() : null;
+    $statusCode = optional($answer)->getStatusCode();
+    $html = optional($answer)->getBody()->getContents();
     $document = new Document($html, false);
 
     $h1 = optional($document->first('h1'))->text();
