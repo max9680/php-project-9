@@ -12,6 +12,7 @@ use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\ClientException;
 use DiDom\Document;
 use Illuminate\Support\Arr;
+use Slim\Exception\HttpNotFoundException;
 
 require __DIR__ . '/../vendor/autoload.php';
 
@@ -100,20 +101,14 @@ $app->get('/urls', function ($request, $response) {
     return $this->get('view')->render($response, 'urls/index.twig.html', $params);
 })->setName('urls.index');
 
-$app->get('/urls/{id}', function ($request, $response, array $args) {
-    if (is_numeric($args['id'])) {
-        $id = $args['id'];
-    } else {
-        return $this->get('view')->render($response->withStatus(404), 'notfound.twig.html');
-    }
-
+$app->get('/urls/{id:[0-9]+}', function ($request, $response, array $args) {
     $sql = "SELECT * FROM urls WHERE id = ?";
     $stm = $this->get('pdo')->prepare($sql);
     $stm->execute([$id]);
     $url = $stm->fetch();
 
     if ($url === false) {
-        return $this->get('view')->render($response->withStatus(404), 'notfound.twig.html');
+        throw new HttpNotFoundException($request);
     }
 
     $sql = "SELECT * FROM url_checks WHERE url_id = ? ORDER BY id DESC";
