@@ -102,6 +102,8 @@ $app->get('/urls', function ($request, $response) {
 })->setName('urls.index');
 
 $app->get('/urls/{id:[0-9]+}', function ($request, $response, array $args) {
+    $id = $args['id'];
+    
     $sql = "SELECT * FROM urls WHERE id = ?";
     $stm = $this->get('pdo')->prepare($sql);
     $stm->execute([$id]);
